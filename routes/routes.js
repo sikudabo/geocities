@@ -1,7 +1,7 @@
 const router = require('express').Router();
 const User = require('../models/UserModel'); //Import the user model for mongoose connectivity.
 const Post = require('../models/PostModel');
-const Community = require('../models/communityModel');
+const Community = require('../models/CommunityModel');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const GridFsStorage = require('multer-gridfs-storage');
