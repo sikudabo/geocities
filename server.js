@@ -22,10 +22,12 @@ const nodemailer = require('nodemailer');
 const sslRedirect = require('heroku-ssl-redirect');
 const routes = require('./routes/routes');
 
+//This is a comment
+
 app.set('port', process.env.PORT || 3001); //Either listen on process.env.PORT or port 3001.
 app.set('appName', 'GeoCities'); //Set the name of the application to "Excite".
 
-app.use(session({secret: '1940gjjnjfnsb', resave: true, saveUnitialized: true, cookie: {maxAge: 3600000}})); //Create a session when the user visits the proper URL. Set the cookie age to 1 hour or 3,600,000 milliseconds.
+app.use(session({secret: '1940gjjnjfnsb', resave: true, saveUninitialized: true, cookie: {maxAge: 3600000}})); //Create a session when the user visits the proper URL. Set the cookie age to 1 hour or 3,600,000 milliseconds.
 app.use(cookieParser()); //Use the cookie parser to help with managing sessions. 
 app.use(logger('dev')); //Use the logger in development environments 
 app.use(errorHandler());
