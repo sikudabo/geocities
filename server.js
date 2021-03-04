@@ -52,7 +52,7 @@ app.use(history({
 app.use('/', routes);
 //Use a wildcard below to serve the static path in the build folder for all unmatched routes. 
 app.get('*', (req, res) => {
-    res.sendFile(path.join('build', 'index.html'));
+    res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
 const server = http.createServer(app);
