@@ -23,7 +23,7 @@ const sslRedirect = require('heroku-ssl-redirect');
 const routes = require('./routes/routes');
 
 app.set('port', process.env.PORT || 3001); //Either listen on process.env.PORT or port 3001.
-app.set('appName', 'Excite'); //Set the name of the application to "Excite".
+app.set('appName', 'GeoCities'); //Set the name of the application to "Excite".
 
 app.use(session({secret: '1940gjjnjfnsb', resave: true, saveUnitialized: true, cookie: {maxAge: 3600000}})); //Create a session when the user visits the proper URL. Set the cookie age to 1 hour or 3,600,000 milliseconds.
 app.use(cookieParser()); //Use the cookie parser to help with managing sessions. 

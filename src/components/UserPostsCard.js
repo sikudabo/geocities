@@ -112,7 +112,7 @@ function UserPostsCard(props) {
 
             return axios({
                 method: 'POST',
-                url: 'http://192.168.0.9:3001/api/add/comment',
+                url: 'https://www.geocities.cc/api/add/comment',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -170,7 +170,7 @@ function UserPostsCard(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.9:3001/api/handle/post/like',
+            url: 'https://www.geocities.cc/api/handle/post/like',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -252,7 +252,7 @@ function UserPostsCard(props) {
 
         return axios({
             method: 'POST',
-            url: `http://192.168.0.9:3001/api/delete/comment`,
+            url: `https://www.geocities.cc/api/delete/comment`,
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -311,7 +311,7 @@ function UserPostsCard(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.9:3001/api/handle/comment/like',
+            url: 'https://www.geocities.cc/api/handle/comment/like',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -367,7 +367,7 @@ function UserPostsCard(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.9:3001/api/delete/post',
+            url: 'https://www.geocities.cc/api/delete/post',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -416,7 +416,7 @@ function UserPostsCard(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.9:3001/api/delete/media/post',
+            url: 'https://www.geocities.cc/api/delete/media/post',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -488,7 +488,7 @@ function UserPostsCard(props) {
                 }
                 avatar={
                     <Avatar 
-                        src={`http://192.168.0.9:3001/api/get/avatar/by/id/${props.post.uniqueUserId}`}
+                        src={`https://www.geocities.cc/api/get/avatar/by/id/${props.post.uniqueUserId}`}
                         alt={`${props.post.username}`}
                         title={`${props.post.username}`} 
                     />
@@ -526,7 +526,7 @@ function UserPostsCard(props) {
                 {props.post.type === 'photo' &&
                     <CardMedia 
                         component='img'
-                        src={`http://192.168.0.9:3001/api/get-photo/${props.post.src}`}
+                        src={`https://www.geocities.cc/api/get-photo/${props.post.src}`}
                         title={`Post by ${props.post.username}`}
                         alt='GeoCities photo post'
                     />
@@ -541,7 +541,7 @@ function UserPostsCard(props) {
                             type='video'
                             sources={[
                                 {
-                                    src: `http://192.168.0.9:3001/api/get-video/${props.post.src}`,
+                                    src: `https://www.geocities.cc/api/get-video/${props.post.src}`,
                                 }
                             ]}
                             fullscreen={{
@@ -714,7 +714,7 @@ function UserPostsCard(props) {
                                         >
                                             <ListItemAvatar>
                                                 <Avatar 
-                                                    src={`http://192.168.0.9:3001/api/get/avatar/by/id/${comment.uniqueUserId}`}
+                                                    src={`https://www.geocities.cc/api/get/avatar/by/id/${comment.uniqueUserId}`}
                                                     title={`${comment.username}`}
                                                     alt={`${comment.username}`} 
                                                     style={{

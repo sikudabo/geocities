@@ -164,7 +164,7 @@ function Login(props) {
             return axios({
                 method: 'post',
                 data: data,
-                url: 'http://192.168.0.9:3001/api/login',
+                url: 'https://www.geocities.cc/api/login',
                 headers: {
                     'Content-Type': 'application/json',
                 }

@@ -158,7 +158,7 @@ function Community(props) {
         if(true) {
             return axios({
                 method: 'GET',
-                url: `http://192.168.0.9:3001/api/fetch/community/${params.communityName}`,
+                url: `https://www.geocities.cc/api/fetch/community/${params.communityName}`,
             }).then(response => {
                 if(response.data.community) {
                     setCommunity(response.data.community);
@@ -206,7 +206,7 @@ function Community(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.9:3001/api/public/join/community',
+            url: 'https://www.geocities.cc/api/public/join/community',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -252,7 +252,7 @@ function Community(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.9:3001/api/community/join/request',
+            url: 'https://www.geocities.cc/api/community/join/request',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -320,7 +320,7 @@ function Community(props) {
 
             return axios({
                 method: 'post',
-                url: 'http://192.168.0.9:3001/api/add/community/text/post',
+                url: 'https://www.geocities.cc/api/add/community/text/post',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -369,7 +369,7 @@ function Community(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.9:3001/api/leave/community',
+            url: 'https://www.geocities.cc/api/leave/community',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -419,7 +419,7 @@ function Community(props) {
                     >
                         <Avatar 
                             className={classes.avatarLg} 
-                            src={`http://192.168.0.9:3001/api/get-photo/${community.avatar}`}
+                            src={`https://www.geocities.cc/api/get-photo/${community.avatar}`}
                             alt={`${community.name} avatar`}
                             title={`${community.name} avatar`}
                             variant='square'
@@ -429,7 +429,7 @@ function Community(props) {
                         mdUp 
                     >
                         <Avatar 
-                            src={`http://192.168.0.9:3001/api/get-photo/${community.avatar}`}
+                            src={`https://www.geocities.cc/api/get-photo/${community.avatar}`}
                             className={classes.avatarSm} 
                             title={`${community.name} avatar`}
                             alt={`${community.name} avatar`}
