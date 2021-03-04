@@ -10,7 +10,7 @@ const path = require('path');
 const _ = require('underscore');
 const { mdiConsoleNetwork } = require('@mdi/js');
 
-const dbUri = 'mongodb+srv://sikudabo:Shooter1?@cluster0.zkhru.mongodb.net/tester?retryWrites=true&w=majority';
+const dbUri = "mongodb+srv://sikudabo:linkkup01@cluster0.zkhru.mongodb.net/tester?retryWrites=true&w=majority";
 
 var conn = mongoose.createConnection(dbUri);
 
