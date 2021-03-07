@@ -112,7 +112,7 @@ function UserPostsCard(props) {
 
             return axios({
                 method: 'POST',
-                url: 'https://www.geocities.cc/api/add/comment',
+                url: 'http://192.168.0.17:3001/api/add/comment',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -170,7 +170,7 @@ function UserPostsCard(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/handle/post/like',
+            url: 'http://192.168.0.17:3001/api/handle/post/like',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -252,7 +252,7 @@ function UserPostsCard(props) {
 
         return axios({
             method: 'POST',
-            url: `https://www.geocities.cc/api/delete/comment`,
+            url: `http://192.168.0.17:3001/api/delete/comment`,
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -311,7 +311,7 @@ function UserPostsCard(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/handle/comment/like',
+            url: 'http://192.168.0.17:3001/api/handle/comment/like',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -367,7 +367,7 @@ function UserPostsCard(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/delete/post',
+            url: 'http://192.168.0.17:3001/api/delete/post',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -416,7 +416,7 @@ function UserPostsCard(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/delete/media/post',
+            url: 'http://192.168.0.17:3001/api/delete/media/post',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -463,6 +463,11 @@ function UserPostsCard(props) {
         setAnchorEl(null);
     }
 
+    function linkClick() {
+        //This function will handle switching to the URL of the link that is clicked if the post is a link post. 
+        history.push(props.post.link); //We will use the link attribute of the post to switch to that location. 
+    }
+
     return (
         <Card 
             className={classes.card} 
@@ -488,7 +493,7 @@ function UserPostsCard(props) {
                 }
                 avatar={
                     <Avatar 
-                        src={`https://www.geocities.cc/api/get/avatar/by/id/${props.post.uniqueUserId}`}
+                        src={`http://192.168.0.17:3001/api/get/avatar/by/id/${props.post.uniqueUserId}`}
                         alt={`${props.post.username}`}
                         title={`${props.post.username}`} 
                     />
@@ -526,9 +531,19 @@ function UserPostsCard(props) {
                 {props.post.type === 'photo' &&
                     <CardMedia 
                         component='img'
-                        src={`https://www.geocities.cc/api/get-photo/${props.post.src}`}
+                        src={`http://192.168.0.17:3001/api/get-photo/${props.post.src}`}
                         title={`Post by ${props.post.username}`}
                         alt='GeoCities photo post'
+                    />
+                }
+            </div>
+            <div>
+                {props.post.type === 'link' && 
+                    <CardMedia 
+                        component='img'
+                        src={props.post.linkImage}
+                        title={`Post by ${props.post.username}`}
+                        alt='GeoCities link post'
                     />
                 }
             </div>
@@ -541,7 +556,7 @@ function UserPostsCard(props) {
                             type='video'
                             sources={[
                                 {
-                                    src: `https://www.geocities.cc/api/get-video/${props.post.src}`,
+                                    src: `http://192.168.0.17:3001/api/get-video/${props.post.src}`,
                                 }
                             ]}
                             fullscreen={{
@@ -714,7 +729,7 @@ function UserPostsCard(props) {
                                         >
                                             <ListItemAvatar>
                                                 <Avatar 
-                                                    src={`https://www.geocities.cc/api/get/avatar/by/id/${comment.uniqueUserId}`}
+                                                    src={`http://192.168.0.17:3001/api/get/avatar/by/id/${comment.uniqueUserId}`}
                                                     title={`${comment.username}`}
                                                     alt={`${comment.username}`} 
                                                     style={{

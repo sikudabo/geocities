@@ -129,7 +129,7 @@ function GeoUserPostsCard(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/handle/geo/post/like',
+            url: 'http://192.168.0.17:3001/api/handle/geo/post/like',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -160,6 +160,105 @@ function GeoUserPostsCard(props) {
                 'error',
             );
             setLikeSending(false);
+        });
+    }
+
+    function deletePost() {
+        //This function will handle deleting a post from the database. 
+        setDeletingPost(true);
+
+        let data = JSON.stringify({
+            uniqueUserId: props.mainUser.uniqueUserId,
+            uniquePostId: props.post.uniquePostId,
+            community: props.post.community,
+            communityPost: true,
+        });
+
+        return axios({
+            method: 'POST',
+            url: 'http://192.168.0.17:3001/api/delete/post',
+            data: data,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then(response => {
+            if(response.data.user) {
+                props.dispatch({type: 'visitorPosts/updatePosts', payload: response.data.posts});
+                swal(
+                    'Great!',
+                    'Post succcessfully deleted',
+                    'success',
+                );
+                setDeletingPost(false);
+            }
+            else {
+                swal(
+                    'Uh Oh!',
+                    'There was an error deleting that post!',
+                    'error',
+                );
+                setDeletingPost(false);
+            }
+        }).catch(err => {
+            console.log(err.message);
+
+            swal(
+                'Uh Oh!',
+                'There was an error deleting that post!',
+                'error',
+            );
+
+            setDeletingPost(false);
+        });
+    }
+
+    function deleteMediaPost() {
+        //This function will handle deleting a post from the database. 
+        setDeletingPost(true);
+
+        let data = JSON.stringify({
+            uniqueUserId: props.mainUser.uniqueUserId,
+            uniquePostId: props.post.uniquePostId,
+            filename: props.post.src,
+            community: props.post.community,
+            communityPost: true,
+        });
+
+        return axios({
+            method: 'POST',
+            url: 'http://192.168.0.17:3001/api/delete/media/post',
+            data: data,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then(response => {
+            if(response.data.user) {
+                props.dispatch({type: 'visitorPosts/updatePosts', payload: response.data.posts});
+                swal(
+                    'Great!',
+                    'Post succcessfully deleted',
+                    'success',
+                );
+                setDeletingPost(false);
+            }
+            else {
+                swal(
+                    'Uh Oh!',
+                    'There was an error deleting that post!',
+                    'error',
+                );
+                setDeletingPost(false);
+            }
+        }).catch(err => {
+            console.log(err.message);
+
+            swal(
+                'Uh Oh!',
+                'There was an error deleting that post!',
+                'error',
+            );
+
+            setDeletingPost(false);
         });
     }
 
@@ -196,7 +295,7 @@ function GeoUserPostsCard(props) {
 
             return axios({
                 method: 'POST',
-                url: 'https://www.geocities.cc/api/add/geo/comment',
+                url: 'http://192.168.0.17:3001/api/add/geo/comment',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -229,11 +328,13 @@ function GeoUserPostsCard(props) {
             uniquePostId: props.post.uniquePostId,
             commentId: uniqueCommentId,
             uniquePosterId: props.post.uniqueUserId,
+            community: props.post.community,
+            communityPost: true,
         };
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/delete/comment',
+            url: 'http://192.168.0.17:3001/api/delete/comment',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -282,18 +383,21 @@ function GeoUserPostsCard(props) {
             username: props.mainUser.username,
             postType: 'personal',
             uniquePostId: props.post.uniquePostId,
+            community: props.post.community,
+            communityPost: true,
         };
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/handle/geo/comment/like',
+            url: 'http://192.168.0.17:3001/api/handle/geo/comment/like',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
             },
         }).then(response => {
+            console.log('Here are the posts');
+            console.log(response.data.posts);
             props.dispatch({type: 'visitorPosts/updatePosts', payload: response.data.posts});
-            props.setter(response.data.geoUser);
             if(response.data.likeType === 'like') {
                 swal(
                     'Great!',
@@ -371,7 +475,7 @@ function GeoUserPostsCard(props) {
                 }
                 avatar={
                     <Avatar 
-                        src={`https://www.geocities.cc/api/get/avatar/by/community/name/${props.post.community}`}
+                        src={`http://192.168.0.17:3001/api/get/avatar/by/community/name/${props.post.community}`}
                         title={`${props.post.username}`}
                         alt={`${props.post.username}`}
                     />
@@ -409,9 +513,17 @@ function GeoUserPostsCard(props) {
                 {props.post.type === 'photo' &&
                     <CardMedia 
                         component='img'
-                        src={`https://www.geocities.cc/api/get-photo/${props.post.src}`}
+                        src={`http://192.168.0.17:3001/api/get-photo/${props.post.src}`}
                         title={`Post by ${props.post.username}`}
                         alt='GeoCities photo post'
+                    />
+                }
+                {props.post.type === 'link' && 
+                    <Card Media 
+                        component='img'
+                        src={props.post.linkImage}
+                        title={`Post by ${props.post.username}`}
+                        alt='GeoCities link post'
                     />
                 }
             </div>
@@ -424,7 +536,7 @@ function GeoUserPostsCard(props) {
                             type='video'
                             sources={[
                                 {
-                                    src: `https://www.geocities.cc/api/get-video/${props.post.src}`,
+                                    src: `http://192.168.0.17:3001/api/get-video/${props.post.src}`,
                                 }
                             ]}
                             fullscreen={{
@@ -438,6 +550,15 @@ function GeoUserPostsCard(props) {
             </div>
             <CardContent>
                 <div>
+                    {props.post.title &&
+                        <Typography 
+                            variant='h3' 
+                            component='h3' 
+                            align='center'
+                        >
+                            {props.post.title}
+                        </Typography>
+                    }
                     {props.post.type === 'text' &&
                         <Typography 
                             variant='body2' 
@@ -446,6 +567,25 @@ function GeoUserPostsCard(props) {
                             {props.post.text}
                         </Typography>
                     }
+                    {props.post.type === 'link' &&
+                        <div>
+                            <a 
+                                href={props.post.link} 
+                                style={{
+                                    textAlign: 'center',
+                                }}
+                            >
+                                Link
+                            </a>
+                            <Typography 
+                                variant='body2' 
+                                component='p' 
+                            >
+                                {props.post.linkDescription}
+                            </Typography>
+
+                        </div>
+                    }   
                 </div>
                 <div>
                     {(props.post.type === 'photo' || props.post.type === 'video') && 
@@ -502,19 +642,26 @@ function GeoUserPostsCard(props) {
                         }
                     </div>
                 </IconButton>
-                {(props.moderator === true || props.mainUser.uniqueUserId === props.post.uniqueUserId) &&
-                    <IconButton 
+                <div>
+                    {(props.post.uniqueUserId === props.mainUser.uniqueUserId || props.moderator === true) && (props.post.type === 'text' || props.post.type === 'link') &&
+                        <IconButton 
+                            color='primary' 
+                            onClick={deletePost}
+                            disabled={deletingPost}
+                        >
+                            {deletingPost ? <CircularProgress color='primary' /> : <Icon path={mdiDelete} size={1} title='Post delete button' aria-label='Post delete button' />}
+                        </IconButton>
+                    }
+                    {(props.post.uniqueUserId === props.mainUser.uniqueUserId || props.moderator === true) && (props.post.type === 'photo' || props.post.type === 'video') &&
+                        <IconButton 
                         color='primary' 
-                        aria-label='Delete post button'
-                    >
-                        <Icon 
-                            path={mdiDelete}
-                            size={1}
-                            title='Delete post icon'
-                            aria-label='Delete post icon' 
-                        />
-                    </IconButton>
-                }
+                        onClick={deleteMediaPost}
+                        disabled={deletingPost}
+                        >
+                            {deletingPost ? <CircularProgress color='primary' /> : <Icon path={mdiDelete} size={1} title='Post delete button' aria-label='Post delete button' />}
+                        </IconButton>
+                    }
+                </div>
                 <IconButton 
                     style={{
                         marginLeft: 'auto' 
@@ -590,7 +737,7 @@ function GeoUserPostsCard(props) {
                                         >
                                             <ListItemAvatar>
                                                 <Avatar 
-                                                    src={`https://www.geocities.cc/api/get/avatar/by/id/${comment.uniqueUserId}`}
+                                                    src={`http://192.168.0.17:3001/api/get/avatar/by/id/${comment.uniqueUserId}`}
                                                     title={`${comment.username}`}
                                                     alt={`${comment.username}`} 
                                                     onClick={e => handleUserPush(comment.uniqueUserId)}
@@ -627,7 +774,7 @@ function GeoUserPostsCard(props) {
                                                 }
                                             />
                                             <div>
-                                                {(props.mainUser.uniqueUserId === comment.uniqueUserId) &&
+                                                {(props.mainUser.uniqueUserId === comment.uniqueUserId || props.moderator === true) &&
                                                     <IconButton 
                                                         color='primary'
                                                         onClick={() => deleteComment(comment.uniqueCommentId)}

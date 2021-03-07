@@ -49,6 +49,14 @@ const postSchema = new mongoose.Schema({
         default: [],
         type: Array,
     },
+    linkImage: {
+        default:'',
+        type: String,
+    },
+    linkDescription: {
+        default: '',
+        type: String,
+    },
 },
 {
     collection: 'posts',

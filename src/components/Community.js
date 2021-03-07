@@ -24,10 +24,12 @@ import { useHistory, useParams } from 'react-router-dom';
 import { makeStyles } from '@material-ui/core/styles';
 import IconButton from '@material-ui/core/IconButton';
 import Icon from '@mdi/react';
-import { mdiClose } from '@mdi/js';
+import { mdiClose, mdiCamera, mdiVideo } from '@mdi/js';
 import PropTypes from 'prop-types';
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
 import CommunityPostsCard from './CommunityPostsCard';
+import Resizer from 'react-image-file-resizer';
+import TextField from '@material-ui/core/TextField';
 
 function TabPanel(props) {
     //This component will serve as the panel for each individual tab.
@@ -105,11 +107,15 @@ function Community(props) {
         closeIcon: {
             color: 'rgb(255, 255, 255)',
         },
+        input: {
+            display: 'none',
+        },
     }));
     const classes = useStyles(); //Custom styles for the component. 
     const history = useHistory(); //Window history API.
     const params = useParams(); //Access url parameters. 
     const textFormRef = useRef(null); //Ref for validator form when we upload posts.
+    const linkFormRef = useRef(null);
     const [joinSending, setJoinSending] = useState(false); //Will disable the button while we send a join or request join to the server.
     const [postDialog, setPostDialog] = useState(false); //Will open and close the dialog to make a post.
     const [curTab, setTab] = useState(0); //Sets the current tab in post upload dialog. 
@@ -123,6 +129,17 @@ function Community(props) {
     const [linkPost, setLinkPost] = useState(''); //Value for the link in a link post. 
     const [linkPostTitle, setLinkPostTitle] = useState(''); //Value for link post title. 
     const [posting, setPosting] = useState(false); //Will handle disabling buttons and bars when a post is being sent to the server.
+    const [uploadPhoto, setUploadPhoto] = useState(null); //Will control any photo post photo that we upload to the server. 
+    const [photoCaption, setPhotoCaption] = useState('');//Variable and setter for a caption for a photo upload. 
+    const [photoUploading, setPhotoUploading] = useState(false); //Used to alter functionality when the photo post is being uploaded to the server. 
+    const [uploadVideo, setUploadVideo] = useState(null); //Variable and setter for a video to be uploaded 
+    const [videoUploading, setVideoUploading] = useState(null); //Variable and setter to disable button while video is uploading. 
+    const [videoCaption, setVideoCaption] = useState(null); //Variable and setter for the caption for a video post. 
+    const [postLink, setPostLink] = useState(''); //This variable will store the link post link. 
+    const regularExpressions = {
+        urlRegex: /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i,
+    }; //This will store the regular expressions to make sure link posts have valid url's. 
+
 
     useEffect(() => {
         //Add validation rules 
@@ -154,11 +171,22 @@ function Community(props) {
                 return true;
             }
         });
+
+        //Validation rule will ensure links are valid 
+        ValidatorForm.addValidationRule('validLink', v => {
+            if(!regularExpressions.urlRegex.test(v)) {
+                return false;
+            }
+            else {
+                return true;
+            }
+        });
+
         //First we need to fetch the community with axios. 
         if(true) {
             return axios({
                 method: 'GET',
-                url: `https://www.geocities.cc/api/fetch/community/${params.communityName}`,
+                url: `http://192.168.0.17:3001/api/fetch/community/${params.communityName}`,
             }).then(response => {
                 if(response.data.community) {
                     setCommunity(response.data.community);
@@ -206,7 +234,7 @@ function Community(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/public/join/community',
+            url: 'http://192.168.0.17:3001/api/public/join/community',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -252,7 +280,7 @@ function Community(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/community/join/request',
+            url: 'http://192.168.0.17:3001/api/community/join/request',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -316,11 +344,13 @@ function Community(props) {
                 uniquePostId: Date.now() + props.mainUser.username + 'textpost' + 'info' + community.name,
                 context: 'community',
                 privacy: community.communityPrivacy,
+                link: postLink ? postLink : '',
+                textType: 'link',
             });
 
             return axios({
                 method: 'post',
-                url: 'https://www.geocities.cc/api/add/community/text/post',
+                url: 'http://192.168.0.17:3001/api/add/community/text/post',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -358,6 +388,283 @@ function Community(props) {
         }
     }
 
+    function sendLinkPost() {
+        //This function will handle sending a post with a link URL to the server.
+        setPosting(true); 
+        let isValid = linkFormRef.current.isFormValid();
+
+        if(!regularExpressions.urlRegex.test(postLink)) {
+            swal(
+                'Uh Oh!',
+                'You must enter a valid URL to create a link post',
+                'error',
+            ); 
+            setPosting(false);
+            return false;
+        }
+
+        else if(textPostTitle === '') {
+            swal(
+                'Uh Oh!',
+                'You must enter a title for all link posts.',
+                'error',
+            );
+            setPosting(false);
+            return false;
+        }
+
+        else if(!isValid) {
+            swal(
+                'Uh Oh!',
+                'Make sure the form is filled out properly',
+                'error',
+            );
+            setPosting(false);
+            return false;
+        }
+        else {
+            let date = new Date();
+            let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+            let month = months[date.getMonth()];
+            let day = date.getDate();
+            let year = date.getFullYear();
+            let dateString = `${month} ${day}, ${year}`;
+            let data = JSON.stringify({
+                text: '',
+                title: textPostTitle,
+                link: postLink,
+                uniqueUserId: props.mainUser.uniqueUserId,
+                username: props.mainUser.username,
+                community: community.name,
+                type: 'link',
+                dateString: dateString,
+                uniquePostId: Date.now() + props.mainUser.username + 'textpost' + 'info' + community.name,
+                context: 'community',
+                privacy: community.communityPrivacy,
+            });
+
+            return axios({
+                method: 'post',
+                url: 'http://192.168.0.17:3001/api/add/community/text/post',
+                data: data,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then(response => {
+                if(response.data.result === 'success') {
+                    props.dispatch({type: 'visitorPosts/updatePosts', payload: response.data.posts});
+                    swal(
+                        'Great!',
+                        'Successfully uploaded link post!',
+                        'success',
+                    );
+                    setTextPost('');
+                    setTextPostTitle('');
+                    setPosting(false);
+                    setPostDialog(false);
+                }
+                else {
+                    swal(
+                        'Uh Oh!',
+                        'There was an error sending that link post!',
+                        'error',
+                    );
+                    setPosting(false);
+                }
+            }).catch(err => {
+                console.log(err.message);
+                swal(
+                    'Uh Oh!',
+                    'There was an error sending that link post! Please try again.',
+                    'error',
+                );
+                setPosting(false);
+            });
+        }
+    }
+
+    function resizerFunction(file) {
+        //This is a wrapper for the file resizer 
+        return new Promise(resolve => {
+            Resizer.imageFileResizer(
+                file,
+                600,
+                600,
+                'JPEG',
+                100,
+                0,
+                uri => {
+                    resolve(uri);
+                },
+                'blob',
+            );
+        });
+    }
+
+    async function handlePhotoChange(e) {
+        //This function will handle passing a photo that is uploaded to the resizer function to rersize the photo
+        let file = e.target.files[0];
+        let resizedPhoto = await resizerFunction(file);
+        setUploadPhoto(resizedPhoto);
+    }
+
+    function handlePhotoUpload() {
+        //Function that will handle sending an uploaded photo to the server after resizing it.
+        //Might need to make some edits here since the photo will be community-based
+        setPhotoUploading(true);
+
+        if(!uploadPhoto) {
+            swal(
+                'Uh Oh!',
+                'You must select a photo to upload!',
+                'error',
+            );
+            setPhotoUploading(false);
+        }
+        else {
+            let data = new Date();
+            let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+            let month = months[data.getMonth()];
+            let day = data.getDate();
+            let year = data.getFullYear();
+            let dateString = `${month} ${day}, ${year}`;
+            let fd = new FormData();
+            fd.append('photo', uploadPhoto, 'photo.jpg');
+            fd.append('caption', photoCaption);
+            fd.append('uniqueUserId', props.mainUser.uniqueUserId);
+            fd.append('uniquePostId', Date.now() + props.mainUser.username + 'photoupload' + props.mainUser.uniqueUserId);
+            fd.append('username', props.mainUser.username);
+            fd.append('dateString', dateString);
+            fd.append('type', 'photo');
+            fd.append('context', 'community');
+            fd.append('link', `http://192.168.0.9:3000/profile#${Date.now()}${props.mainUser.username}photoupload${props.mainUser.uniqueUserId}`);
+            fd.append('community', community.name); //Name of the community that this post belongs to. 
+            fd.append('title', '');
+            fd.append('privacy', community.communityPrivacy);
+            fd.append('text', '');
+
+            return axios({
+                method: 'POST',
+                url: 'http://192.168.0.17:3001/api/upload/photo',
+                data: fd,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }).then(response => {
+                if(response.data.posts) {
+                    props.dispatch({type: 'visitorPosts/updatePosts', payload: response.data.posts});
+                    swal(
+                        'Great!',
+                        'Successfully uploaded photo!',
+                        'success',
+                    );
+                    setPhotoCaption('');
+                    setUploadPhoto(null);
+                    setPostDialog(false);
+                    setPhotoUploading(false);
+                }
+                else {
+                    swal(
+                        'Uh Oh!',
+                        'There was an error uploading that photo!',
+                        'error',
+                    );
+                    setPhotoUploading(false);
+                }
+            }).catch(err => {
+                console.log(err.message);
+                swal(
+                    'Uh Oh!',
+                    'There was an error uploading that photo!',
+                    'error',
+                );
+                setPhotoUploading(false);
+            });
+        }
+    }
+
+    function handleVideoChange(e) {
+        //This function will handle setting the uploadVideo variable to the valua of the file. 
+        setUploadVideo(e.target.files[0]);
+    }
+
+    function handleVideoUpload() {
+        //Function that will handle sending an uploaded video to the server.
+        setVideoUploading(true);
+
+        if(!uploadVideo) {
+            swal(
+                'Uh Oh!',
+                'You must select a video to upload!',
+                'error',
+            );
+            setVideoUploading(false);
+        }
+        else {
+            let data = new Date();
+            let months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sept', 'Oct', 'Nov', 'Dec'];
+            let month = months[data.getMonth()];
+            let day = data.getDate();
+            let year = data.getFullYear();
+            let dateString = `${month} ${day}, ${year}`;
+            let ext = uploadVideo.name.split('.').pop().toString(); //This will get the extension name of the video 
+            ext = 'video.' + ext;
+            let fd = new FormData();
+            fd.append('photo', uploadVideo, ext); //Keep the name "photo" for the server upload although it is technically a video!
+            fd.append('caption', videoCaption);
+            fd.append('uniqueUserId', props.mainUser.uniqueUserId);
+            fd.append('uniquePostId', Date.now() + props.mainUser.username + 'videoupload' + props.mainUser.uniqueUserId);
+            fd.append('username', props.mainUser.username);
+            fd.append('dateString', dateString);
+            fd.append('type', 'video');
+            fd.append('context', 'community');
+            fd.append('link', `http://192.168.0.9:3000/profile#${Date.now()}${props.mainUser.username}videoupload${props.mainUser.uniqueUserId}`);
+            fd.append('community', community.name);
+            fd.append('communityPost', true);
+            fd.append('title', '');
+            fd.append('privacy', community.communityPrivacy);
+            fd.append('text', '');
+
+            return axios({
+                method: 'POST',
+                url: 'http://192.168.0.17:3001/api/upload/photo',
+                data: fd,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }).then(response => {
+                if(response.data.posts) {
+                    props.dispatch({type: 'visitorPosts/updatePosts', payload: response.data.posts});
+                    swal(
+                        'Great!',
+                        'Successfully uploaded video!',
+                        'success',
+                    );
+                    setVideoCaption('');
+                    setUploadVideo(null);
+                    setPostDialog(false);
+                    setVideoUploading(false);
+                }
+                else {
+                    swal(
+                        'Uh Oh!',
+                        'There was an error uploading that video!',
+                        'error',
+                    );
+                    setVideoUploading(false);
+                }
+            }).catch(err => {
+                console.log(err.message);
+                swal(
+                    'Uh Oh!',
+                    'There was an error uploading that video!',
+                    'error',
+                );
+                setVideoUploading(false);
+            });
+        }
+    }
+
     function leaveCommunity() {
         //This function will remove a member from a community if they are within it. 
         setJoinSending(true);
@@ -369,7 +676,7 @@ function Community(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/leave/community',
+            url: 'http://192.168.0.17:3001/api/leave/community',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -419,7 +726,7 @@ function Community(props) {
                     >
                         <Avatar 
                             className={classes.avatarLg} 
-                            src={`https://www.geocities.cc/api/get-photo/${community.avatar}`}
+                            src={`http://192.168.0.17:3001/api/get-photo/${community.avatar}`}
                             alt={`${community.name} avatar`}
                             title={`${community.name} avatar`}
                             variant='square'
@@ -429,7 +736,7 @@ function Community(props) {
                         mdUp 
                     >
                         <Avatar 
-                            src={`https://www.geocities.cc/api/get-photo/${community.avatar}`}
+                            src={`http://192.168.0.17:3001/api/get-photo/${community.avatar}`}
                             className={classes.avatarSm} 
                             title={`${community.name} avatar`}
                             alt={`${community.name} avatar`}
@@ -699,6 +1006,201 @@ function Community(props) {
                                             variant='contained' 
                                             color='primary' 
                                             onClick={sendTextPost}
+                                            disabled={posting}
+                                        >
+                                            {posting ? <CircularProgress color='primary' /> : 'Upload'}
+                                        </Button>
+                                    </ValidatorForm>
+                                </TabPanel>
+                                <TabPanel 
+                                    index={1} 
+                                    value={curTab} 
+                                >
+                                    <Typography 
+                                        variant='h6' 
+                                        component='h6' 
+                                    >
+                                        Post a photo
+                                    </Typography>
+                                    <label 
+                                        html-for='photoPost' 
+                                    >
+                                        <input 
+                                            className={classes.input}
+                                            type='file'
+                                            accept='image/jpg, image/jpeg, image/png' 
+                                            id='photoPost'
+                                            name='photoPost' 
+                                            onChange={handlePhotoChange} 
+                                            required 
+                                        />
+                                        <Button 
+                                            variant='contained' 
+                                            color='primary' 
+                                            component='span' 
+                                            aria-label='Photo picker button'
+                                        >
+                                            <Icon 
+                                                path={mdiCamera} 
+                                                size={1} 
+                                                title='Photo upload icon' 
+                                                aria-label='Photo upload icon' 
+                                            />
+                                        </Button>
+                                    </label>
+                                    <br/>
+                                    <TextField 
+                                        label='Caption'
+                                        placeholder='Enter a caption for your photo' 
+                                        variant='outlined' 
+                                        color='primary' 
+                                        value={photoCaption} 
+                                        onChange={e => setPhotoCaption(e.target.value)} 
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                        rows={4}
+                                        multiline
+                                        required
+                                        style={{
+                                            marginTop: 40,
+                                        }}
+                                        fullWidth
+                                    />
+                                    <br/>
+                                    <Button 
+                                        style={{
+                                            marginTop: 30,
+                                        }}
+                                        color='primary' 
+                                        variant='outlined' 
+                                        onClick={handlePhotoUpload}
+                                        disabled={photoUploading}
+                                    >
+                                        {photoUploading ? <CircularProgress color='primary' /> : 'Upload Photo'}
+                                    </Button>
+                                </TabPanel>
+                                <TabPanel 
+                                    index={2} 
+                                    value={curTab} 
+                                >
+                                    <Typography 
+                                        variant='h6' 
+                                        component='h6' 
+                                    >
+                                        Post a video
+                                    </Typography>
+                                    <label 
+                                        html-for='videoPost' 
+                                    >
+                                        <input 
+                                            className={classes.input}
+                                            type='file'
+                                            accept='video/mp4, video/mov'
+                                            id='videoPost'
+                                            name='videoPost' 
+                                            onChange={handleVideoChange} 
+                                            required 
+                                        />
+                                        <Button 
+                                            variant='contained' 
+                                            color='primary' 
+                                            component='span' 
+                                            aria-label='Video picker button'
+                                        >
+                                            <Icon 
+                                                path={mdiVideo} 
+                                                size={1} 
+                                                title='Video upload icon' 
+                                                aria-label='Video upload icon' 
+                                            />
+                                        </Button>
+                                    </label>
+                                    <br/>
+                                    <TextField 
+                                        label='Caption'
+                                        placeholder='Enter a caption for your video' 
+                                        variant='outlined' 
+                                        color='primary' 
+                                        value={videoCaption} 
+                                        onChange={e => setVideoCaption(e.target.value)} 
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                        rows={4}
+                                        multiline
+                                        required
+                                        style={{
+                                            marginTop: 40,
+                                        }}
+                                        fullWidth
+                                    />
+                                    <br/>
+                                    <Button 
+                                        style={{
+                                            marginTop: 30,
+                                        }}
+                                        color='primary' 
+                                        variant='outlined' 
+                                        onClick={handleVideoUpload}
+                                        disabled={videoUploading}
+                                    >
+                                        {videoUploading ? <CircularProgress color='primary' /> : 'Upload Video'}
+                                    </Button>
+                                </TabPanel>
+                                <TabPanel 
+                                    index={3}
+                                    value={curTab}
+                                >
+                                    <ValidatorForm
+                                        ref={linkFormRef} 
+                                        onSubmit={e => e.preventDefault()}
+                                    >
+                                        <Typography 
+                                            variant='body1' 
+                                            component='small' 
+                                            color={textPostTitle.length > 75 ? 'error' : 'default'}
+                                            align='center' 
+                                        >
+                                            {textPostTitle.length}/75
+                                        </Typography>
+                                        <TextValidator 
+                                            label='Post title'
+                                            placeholder='Enter a title for your post of 75 characters or less'
+                                            value={textPostTitle}
+                                            onChange={e => setTextPostTitle(e.target.value)}
+                                            helperText='Enter a title for this text post'
+                                            validators={['requiredText', 'titleLength']}
+                                            errorMessages={['Must enter a title for all link posts', 'Title can only be up to 75 characters']}
+                                            InputLabelProps={{
+                                                shrink: true,
+                                            }}
+                                            color='primary'
+                                            variant='outlined'
+                                            fullWidth
+                                        />
+                                        <br></br>
+                                        <TextValidator 
+                                            label='Link'
+                                            placeholder='Share a valid link!'
+                                            value={postLink}
+                                            onChange={e => setPostLink(e.target.value)}
+                                            helperText='Enter a valid url link.'
+                                            validators={['requiredText', 'validLink']}
+                                            errorMessages={['Must enter a link!', 'The link that you enter must be formatted properly!']}
+                                            variant='outlined' 
+                                            InputLabelProps={{
+                                                shrink: true,
+                                            }}
+                                            color='primary' 
+                                            variant='outlined'
+                                            required 
+                                            fullWidth 
+                                        />
+                                        <Button 
+                                            variant='contained' 
+                                            color='primary' 
+                                            onClick={sendLinkPost}
                                             disabled={posting}
                                         >
                                             {posting ? <CircularProgress color='primary' /> : 'Upload'}

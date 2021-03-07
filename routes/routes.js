@@ -9,9 +9,10 @@ const Grid = require('gridfs-stream');
 const path = require('path');
 const _ = require('underscore');
 const { mdiConsoleNetwork } = require('@mdi/js');
+const axios = require('axios');
 
-const dbUri = 'mongodb+srv://sikudabo:shooter1@cluster0.zkhru.mongodb.net/tester?retryWrites=true&w=majority';
-
+//const dbUri = 'mongodb+srv://sikudabo:shooter1@cluster0.zkhru.mongodb.net/tester?retryWrites=true&w=majority';
+const dbUri = 'mongodb://localhost:27017/geocities';
 var conn = mongoose.createConnection(dbUri);
 
 conn.once('open', () => {
@@ -878,23 +879,44 @@ router.route('/api/delete/comment').post((req, res) => {
                 res.status(500).send('error');
             }
             else {
-                Post.find({uniqueUserId: req.body.uniquePosterId, context: 'personal'}, {}, {sort: {utcTime: -1}}, (err, posts) => {
-                    if(err) {
-                        console.log(err.message);
-                        res.status(500).send('error');
-                    }
-                    else {
-                        User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
-                            if(err) {
-                                console.log(err.message);
-                                res.status(500).send('error');
-                            }
-                            else {
-                                res.status(200).json({user: user, posts: posts});
-                            }
-                        });
-                    }
-                });
+                if(req.body.communityPost) {
+                    Post.find({community: req.body.community}, {}, {sort: {utcTime: -1}}, (err, posts) => {
+                        if(err) {
+                            console.log(err.message);
+                            res.status(500).send('error');
+                        }
+                        else {
+                            User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+                                if(err) {
+                                    console.log(err.message);
+                                    res.status(500).send('error');
+                                }
+                                else {
+                                    res.status(200).json({user: user, posts: posts});
+                                }
+                            });
+                        }
+                    });
+                }
+                else {
+                    Post.find({uniqueUserId: req.body.uniquePosterId, context: 'personal'}, {}, {sort: {utcTime: -1}}, (err, posts) => {
+                        if(err) {
+                            console.log(err.message);
+                            res.status(500).send('error');
+                        }
+                        else {
+                            User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+                                if(err) {
+                                    console.log(err.message);
+                                    res.status(500).send('error');
+                                }
+                                else {
+                                    res.status(200).json({user: user, posts: posts});
+                                }
+                            });
+                        }
+                    });
+                }
             }
         });
     }
@@ -947,44 +969,86 @@ router.route('/api/handle/geo/comment/like').post((req, res) => {
                                                 res.status(500).send('error');
                                             }
                                             else {
-                                                Post.find({uniqueUserId: req.body.uniquePostPosterId}, {}, {sort: {utcTime: -1}}, (err, posts) => {
-                                                    if(err) {
-                                                        console.log(err.message);
-                                                        res.status(500).send('error');
-                                                    }
-                                                    else {
-                                                        User.findOne({uniqueUserId: req.body.uniquePostPosterId}, (err, user) => {
-                                                            if(err) {
-                                                                console.log(err.message);
-                                                                res.status(500).send('error');
-                                                            }
-                                                            else {
-                                                                res.status(200).json({geoUser: user, posts: posts, likeType: 'like'});
-                                                            }
-                                                        });
-                                                    }
-                                                });
+                                                if(req.body.communityPost) {
+                                                    Post.find({community: req.body.community}, {}, {sort: {utcTime: -1}}, (err, posts) => {
+                                                        if(err) {
+                                                            console.log(err.message);
+                                                            res.status(500).send('error');
+                                                        }
+                                                        else {
+                                                            User.findOne({uniqueUserId: req.body.uniquePostPosterId}, (err, user) => {
+                                                                if(err) {
+                                                                    console.log(err.message);
+                                                                    res.status(500).send('error');
+                                                                }
+                                                                else {
+                                                                    res.status(200).json({geoUser: user, posts: posts, likeType: 'like'});
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+                                                }
+                                                else {
+                                                    Post.find({uniqueUserId: req.body.uniquePostPosterId}, {}, {sort: {utcTime: -1}}, (err, posts) => {
+                                                        if(err) {
+                                                            console.log(err.message);
+                                                            res.status(500).send('error');
+                                                        }
+                                                        else {
+                                                            User.findOne({uniqueUserId: req.body.uniquePostPosterId}, (err, user) => {
+                                                                if(err) {
+                                                                    console.log(err.message);
+                                                                    res.status(500).send('error');
+                                                                }
+                                                                else {
+                                                                    res.status(200).json({geoUser: user, posts: posts, likeType: 'like'});
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+                                                }
                                             }
                                         });
                                     }
                                     else {
-                                        Post.find({uniqueUserId: req.body.uniquePostPosterId, context: 'personal'}, {}, {sort: {utcTime: -1}}, (err, posts) => {
-                                            if(err) {
-                                                console.log(err.message);
-                                                res.status(500).send('error');
-                                            }
-                                            else {
-                                                User.findOne({uniqueUserId: req.body.uniquePostPosterId}, (err, user) => {
-                                                    if(err) {
-                                                        console.log(err.message);
-                                                        res.status(500).send('error');
-                                                    }
-                                                    else {
-                                                        res.status(200).json({geoUser: user, posts: posts, likeType: 'like'});
-                                                    }
-                                                });
-                                            }
-                                        });
+                                        if(req.body.communityPost) {
+                                            Post.find({community: req.body.community}, {}, {sort: {utcTime: -1}}, (err, posts) => {
+                                                if(err) {
+                                                    console.log(err.message);
+                                                    res.status(500).send('error');
+                                                }
+                                                else {
+                                                    User.findOne({uniqueUserId: req.body.uniquePostPosterId}, (err, user) => {
+                                                        if(err) {
+                                                            console.log(err.message);
+                                                            res.status(500).send('error');
+                                                        }
+                                                        else {
+                                                            res.status(200).json({geoUser: user, posts: posts, likeType: 'like'});
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                        else {
+                                            Post.find({uniqueUserId: req.body.uniquePostPosterId, context: 'personal'}, {}, {sort: {utcTime: -1}}, (err, posts) => {
+                                                if(err) {
+                                                    console.log(err.message);
+                                                    res.status(500).send('error');
+                                                }
+                                                else {
+                                                    User.findOne({uniqueUserId: req.body.uniquePostPosterId}, (err, user) => {
+                                                        if(err) {
+                                                            console.log(err.message);
+                                                            res.status(500).send('error');
+                                                        }
+                                                        else {
+                                                            res.status(200).json({geoUser: user, posts: posts, likeType: 'like'});
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
                                     }
                                 }
                             });
@@ -1014,23 +1078,44 @@ router.route('/api/handle/geo/comment/like').post((req, res) => {
                                     res.status(500).send('error');
                                 }
                                 else {
-                                    Post.find({uniqueUserId: req.body.uniquePostPosterId, context: 'personal'}, {}, {sort: {utcTime: -1}}, (err, posts) => {
-                                        if(err) {
-                                            console.log(err.message);
-                                            res.status(500).send('error');
-                                        }
-                                        else {
-                                            User.findOne({uniqueUserId: req.body.uniquePostPosterId}, (err, user) => {
-                                                if(err) {
-                                                    console.log(err.message);
-                                                    res.status(500).send('error');
-                                                }
-                                                else {
-                                                    res.status(200).json({geoUser: user, posts: posts, likeType: 'unlike'});
-                                                }
-                                            });
-                                        }
-                                    });
+                                    if(req.body.communityPost) {
+                                        Post.find({community: req.body.community}, {}, {sort: {utcTime: -1}}, (err, posts) => {
+                                            if(err) {
+                                                console.log(err.message);
+                                                res.status(500).send('error');
+                                            }
+                                            else {
+                                                User.findOne({uniqueUserId: req.body.uniquePostPosterId}, (err, user) => {
+                                                    if(err) {
+                                                        console.log(err.message);
+                                                        res.status(500).send('error');
+                                                    }
+                                                    else {
+                                                        res.status(200).json({geoUser: user, posts: posts, likeType: 'unlike'});
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
+                                    else {
+                                        Post.find({uniqueUserId: req.body.uniquePostPosterId, context: 'personal'}, {}, {sort: {utcTime: -1}}, (err, posts) => {
+                                            if(err) {
+                                                console.log(err.message);
+                                                res.status(500).send('error');
+                                            }
+                                            else {
+                                                User.findOne({uniqueUserId: req.body.uniquePostPosterId}, (err, user) => {
+                                                    if(err) {
+                                                        console.log(err.message);
+                                                        res.status(500).send('error');
+                                                    }
+                                                    else {
+                                                        res.status(200).json({geoUser: user, posts: posts, likeType: 'unlike'});
+                                                    }
+                                                });
+                                            }
+                                        });
+                                    }
                                 }
                             });
                         }
@@ -1197,23 +1282,44 @@ router.route('/api/delete/post').post((req, res) => {
                 res.status(500).send('error');
             }
             else {
-                Post.find({uniqueUserId: req.body.uniqueUserId, context: 'personal'}, {}, {sort: {utcTime: -1}}, (err, posts) => {
-                    if(err) {
-                        console.log(err.message);
-                        res.status(500).send('error');
-                    }
-                    else {
-                        User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
-                            if(err) {
-                                console.log(err.message);
-                                res.status(500).send('error');
-                            }
-                            else {
-                                res.status(200).json({user: user, posts: posts});
-                            }
-                        });
-                    }
-                });
+                if(req.body.communityPost) {
+                    Post.find({community: req.body.community, context: 'community'}, {}, {sort: {utcTime: -1}}, (err, posts) => {
+                        if(err) {
+                            console.log(err.message);
+                            res.status(500).send('error');
+                        }
+                        else {
+                            User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+                                if(err) {
+                                    console.log(err.message);
+                                    res.status(500).send('error');
+                                }
+                                else {
+                                    res.status(200).json({user: user, posts: posts});
+                                }
+                            });
+                        }
+                    });
+                }
+                else {
+                    Post.find({uniqueUserId: req.body.uniqueUserId, context: 'personal'}, {}, {sort: {utcTime: -1}}, (err, posts) => {
+                        if(err) {
+                            console.log(err.message);
+                            res.status(500).send('error');
+                        }
+                        else {
+                            User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+                                if(err) {
+                                    console.log(err.message);
+                                    res.status(500).send('error');
+                                }
+                                else {
+                                    res.status(200).json({user: user, posts: posts});
+                                }
+                            });
+                        }
+                    });
+                }
             }
         });
     }
@@ -1241,23 +1347,44 @@ router.route('/api/delete/media/post').post((req, res) => {
                         res.status(500).send('error');
                     }
                     else {
-                        Post.find({uniqueUserId: req.body.uniqueUserId, context: req.body.community ? 'community' : 'personal'}, {}, {sort: {utcTime: -1}}, (err, posts) => {
-                            if(err) {
-                                console.log(err.message);
-                                res.status(500).send('error');
-                            }
-                            else {
-                                User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
-                                    if(err) {
-                                        console.log(err.message);
-                                        res.status(500).send('error');
-                                    }
-                                    else {
-                                        res.status(200).json({user: user, posts: posts});
-                                    }
-                                });
-                            }
-                        });
+                        if(req.body.communityPost) {
+                            Post.find({community: req.body.community}, {}, {sort: {utcTime: -1}}, (err, posts) => {
+                                if(err) {
+                                    console.log(err.message);
+                                    res.status(500).send('error');
+                                }
+                                else {
+                                    User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+                                        if(err) {
+                                            console.log(err.message);
+                                            res.status(500).send('error');
+                                        }
+                                        else {
+                                            res.status(200).json({user: user, posts: posts});
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                        else {
+                            Post.find({uniqueUserId: req.body.uniqueUserId, context: req.body.community ? 'community' : 'personal'}, {}, {sort: {utcTime: -1}}, (err, posts) => {
+                                if(err) {
+                                    console.log(err.message);
+                                    res.status(500).send('error');
+                                }
+                                else {
+                                    User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+                                        if(err) {
+                                            console.log(err.message);
+                                            res.status(500).send('error');
+                                        }
+                                        else {
+                                            res.status(200).json({user: user, posts: posts});
+                                        }
+                                    });
+                                }
+                            });
+                        }
                     }
                 });
             }
@@ -1299,15 +1426,28 @@ router.route('/api/upload/photo').post(uploads.single('photo'), (req, res) => {
                 res.status(500).send('error');
             }
             else {
-                Post.find({uniqueUserId: req.body.uniqueUserId, context: 'personal'}, {}, {sort: {utcTime: -1}}, (err, posts) => {
-                    if(err) {
-                        console.log(err.message);
-                        res.status(500).send('error');
-                    }
-                    else {
-                        res.status(200).json({posts: posts});
-                    }
-                });
+                if(req.body.context === 'personal') {
+                    Post.find({uniqueUserId: req.body.uniqueUserId, context: 'personal'}, {}, {sort: {utcTime: -1}}, (err, posts) => {
+                        if(err) {
+                            console.log(err.message);
+                            res.status(500).send('error');
+                        }
+                        else {
+                            res.status(200).json({posts: posts});
+                        }
+                    });
+                }
+                else {
+                    Post.find({community: req.body.community, context: 'community'}, {}, {sort: {utcTime: -1}}, (err, posts) => {
+                        if(err) {
+                            console.log(err.message);
+                            res.status(500).send('error');
+                        }
+                        else {
+                            res.status(200).json({posts: posts});
+                        }
+                    });
+                }
             }
         });
     }
@@ -2050,33 +2190,61 @@ router.route('/api/add/community/text/post').post((req, res) => {
             privacy: req.body.privacy,
             utcTime: Date.now(),
             context: req.body.context,
-            text: req.body.text,
+            text: req.body.text ? req.body.text : '',
             type: req.body.type,
             likes: [],
-            link: '',
+            link: req.body.link ? req.body.link : '',
             caption: '',
             blockList: [],
             comments: [],
             src: '',
         });
 
-        newPost.save(err => {
-            if(err) {
-                console.log(err.message);
-                res.status(500).send('error');
-            }
-            else {
-                Post.find({context: 'community', community: req.body.community}, {}, {sort: {utcTime: -1}}, (err, posts) => {
+        if(req.body.link) {
+            let targetLink = 'https://meta.mehari.workers.dev/?url=' + req.body.link;
+            axios.get(targetLink).then((response) => {
+                let linkImage = response.data.image;
+                let linkDescription = response.data.description;
+                newPost.linkImage = linkImage;
+                newPost.linkDescription = linkDescription;
+                newPost.save(err => {
                     if(err) {
                         console.log(err.message);
                         res.status(500).send('error');
                     }
                     else {
-                        res.status(200).json({result: 'success', posts: posts});
+                        Post.find({context: 'community', community: req.body.community}, {}, {sort: {utcTime: -1}}, (err, posts) => {
+                            if(err) {
+                                console.log(err.message);
+                                res.status(500).send('error');
+                            }
+                            else {
+                                res.status(200).json({result: 'success', posts: posts, postType: 'link'});
+                            }
+                        });
                     }
                 });
-            }
-        });
+            });
+        }
+        else {
+            newPost.save(err => {
+                if(err) {
+                    console.log(err.message);
+                    res.status(500).send('error');
+                }
+                else {
+                    Post.find({context: 'community', community: req.body.community}, {}, {sort: {utcTime: -1}}, (err, posts) => {
+                        if(err) {
+                            console.log(err.message);
+                            res.status(500).send('error');
+                        }
+                        else {
+                            res.status(200).json({result: 'success', posts: posts, postType: 'text'});
+                        }
+                    });
+                }
+            });
+        }
     }
     catch(err) {
         console.log(err.message);
