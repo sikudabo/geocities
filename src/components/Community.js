@@ -870,6 +870,7 @@ function Community(props) {
                                     style={{
                                         margin: 'auto',
                                     }}
+                                    onClick={e => history.push(`/community/chat/${community.name}`)}
                                 >
                                     Chat 
                                 </Button>

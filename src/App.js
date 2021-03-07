@@ -20,6 +20,7 @@ import GeouserFollowers from './components/GeouserFollowers';
 import GeoUserFollowing from './components/GeoUserFollowing';
 import BuildCommunity from './components/BuildCommunity';
 import Community from './components/Community'
+import CommunityChat from './components/CommunityChat';
 
 function App(props) {
   const theme = createMuiTheme({
@@ -101,6 +102,11 @@ function App(props) {
             component={Community}
             path='/community/:communityName'
             exact 
+          />
+          <Route 
+            component={CommunityChat}
+            path='/community/chat/:communityName'
+            exact
           />
         </Switch>
       </ThemeProvider>
