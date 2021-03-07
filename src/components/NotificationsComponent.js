@@ -17,6 +17,7 @@ import swal from 'sweetalert';
 import axios from 'axios';
 import Avatar from '@material-ui/core/Avatar';
 import Paper from '@material-ui/core/Paper';
+import GeoIcon from '../site-icons/geoicon2.png';
 
 const useStyles = makeStyles(() => ({
     root: {
@@ -587,6 +588,37 @@ function NotificationsComponent(props) {
                                                 />
                                             </IconButton>
                                         </Paper> 
+                                    }
+                                    {notification.type === 'welcome' && 
+                                        <Paper 
+                                            elevation={3} 
+                                        >
+                                            <ListItem 
+                                                style={{
+                                                    cursor: 'pointer',
+                                                    marginBottom: 20,
+                                                }}
+                                                onClick={e => deleteNotification(notification.uniqueNotificationId, notification.link)}
+                                            >
+                                                <ListItemAvatar>
+                                                    <Avatar 
+                                                        alt='GeoCities logo'
+                                                        title='GeoCities logo'
+                                                        src={GeoIcon}
+                                                    />
+                                                </ListItemAvatar>
+                                                <ListItemText 
+                                                    secondary={
+                                                        <Typography 
+                                                            variant='body1' 
+                                                            component='p'
+                                                        >
+                                                            Welcome to GeoCities. We hope that you have fun building communites and connecting with others!
+                                                        </Typography>
+                                                    }
+                                                />
+                                            </ListItem>
+                                        </Paper>
                                     }
                                     {notification.type === 'accept follow request' &&
                                         <Paper

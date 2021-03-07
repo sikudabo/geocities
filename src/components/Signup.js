@@ -416,7 +416,7 @@ function Signup(props) {
             return axios({
                 method: 'POST',
                 data: fd,
-                url: 'http://192.168.0.17:3001/api/signup',
+                url: 'http://10.162.4.11:3001/api/signup',
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },

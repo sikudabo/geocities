@@ -28,6 +28,7 @@ import { mdiClose, mdiCamera, mdiVideo } from '@mdi/js';
 import PropTypes from 'prop-types';
 import { ValidatorForm, TextValidator } from 'react-material-ui-form-validator';
 import CommunityPostsCard from './CommunityPostsCard';
+import NonUserCommunityPostsCard from './NonUserCommunityPostsCard';
 import Resizer from 'react-image-file-resizer';
 import TextField from '@material-ui/core/TextField';
 
@@ -186,7 +187,7 @@ function Community(props) {
         if(true) {
             return axios({
                 method: 'GET',
-                url: `http://192.168.0.17:3001/api/fetch/community/${params.communityName}`,
+                url: `http://10.162.4.11:3001/api/fetch/community/${params.communityName}`,
             }).then(response => {
                 if(response.data.community) {
                     setCommunity(response.data.community);
@@ -234,7 +235,7 @@ function Community(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.17:3001/api/public/join/community',
+            url: 'http://10.162.4.11:3001/api/public/join/community',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -280,7 +281,7 @@ function Community(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.17:3001/api/community/join/request',
+            url: 'http://10.162.4.11:3001/api/community/join/request',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -350,7 +351,7 @@ function Community(props) {
 
             return axios({
                 method: 'post',
-                url: 'http://192.168.0.17:3001/api/add/community/text/post',
+                url: 'http://10.162.4.11:3001/api/add/community/text/post',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -445,7 +446,7 @@ function Community(props) {
 
             return axios({
                 method: 'post',
-                url: 'http://192.168.0.17:3001/api/add/community/text/post',
+                url: 'http://10.162.4.11:3001/api/add/community/text/post',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -545,7 +546,7 @@ function Community(props) {
 
             return axios({
                 method: 'POST',
-                url: 'http://192.168.0.17:3001/api/upload/photo',
+                url: 'http://10.162.4.11:3001/api/upload/photo',
                 data: fd,
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -627,7 +628,7 @@ function Community(props) {
 
             return axios({
                 method: 'POST',
-                url: 'http://192.168.0.17:3001/api/upload/photo',
+                url: 'http://10.162.4.11:3001/api/upload/photo',
                 data: fd,
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -676,7 +677,7 @@ function Community(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.17:3001/api/leave/community',
+            url: 'http://10.162.4.11:3001/api/leave/community',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -726,7 +727,7 @@ function Community(props) {
                     >
                         <Avatar 
                             className={classes.avatarLg} 
-                            src={`http://192.168.0.17:3001/api/get-photo/${community.avatar}`}
+                            src={`http://10.162.4.11:3001/api/get-photo/${community.avatar}`}
                             alt={`${community.name} avatar`}
                             title={`${community.name} avatar`}
                             variant='square'
@@ -736,7 +737,7 @@ function Community(props) {
                         mdUp 
                     >
                         <Avatar 
-                            src={`http://192.168.0.17:3001/api/get-photo/${community.avatar}`}
+                            src={`http://10.162.4.11:3001/api/get-photo/${community.avatar}`}
                             className={classes.avatarSm} 
                             title={`${community.name} avatar`}
                             alt={`${community.name} avatar`}
@@ -1277,6 +1278,12 @@ function Community(props) {
                                                     post={post}
                                                     id={post.uniquePostId}
                                                     moderator={props.mainUser.uniqueUserId === community.moderator.uniqueUserId}
+                                                />
+                                            }
+                                            {props.mainUser === null &&
+                                                <NonUserCommunityPostsCard 
+                                                    post={post}
+                                                    id={post.uniquePostId}
                                                 />
                                             }
                                             {index < props.posts.length - 1 &&

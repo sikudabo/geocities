@@ -57,12 +57,30 @@ app.get('*', (req, res) => {
     res.sendFile(path.join(__dirname, 'build', 'index.html'));
 });
 
-const server = http.createServer(app);
-const start = server.listen(app.get('port'), () => {
-    console.log(`Listening on port ${app.get('port')}`);
-});
-
 //The code below will prevent the process from exiting and freezing the app on an error.
 process.on('uncaughtException', err => {
     console.log(`Uncaught Exception: ${err.message}`)
+});
+
+const server = http.createServer(app).listen(app.get('port'), () => {
+    console.log(`Listening on port ${app.get('port')}`);
+});
+
+const io = require('socket.io').listen(server);
+
+io.on('connection', socket => {
+    console.log(`Connected to socket: ${socket.id}`);
+
+    socket.on('disconnect', () => {
+        console.log(`${socket.id} has disconnected!`);
+    });
+
+    socket.on('joinRoom', data => {
+        console.log(`${data.username} has joined ${data.room} chat`);
+        let room = data.room;
+        socket.join(room);
+        io.to(room).emit('userJoined', {
+            username: data.username,
+        });
+    });
 });

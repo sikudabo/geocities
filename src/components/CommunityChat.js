@@ -35,7 +35,7 @@ const useStyles = makeStyles(() => ({
 function CommunityChat(props) {
     const classes = useStyles(); //Custom component classes. 
     const [community, setCommunity]= useState(null); //Variable and setter for the community we are in.
-    const socket = io('http://192.168.0.17:3001/'); //Socket that connects to the server IP. 
+    const socket = io('http://10.162.4.11:3001/'); //Socket that connects to the server IP. 
     const [msg, setMsg] = useState(''); //The message that could be sent to the server for another chat. 
     const params = useParams();
     const history = useHistory();
@@ -44,13 +44,9 @@ function CommunityChat(props) {
         if(props.mainUser) {
             return axios({
                 method: 'GET',
-                url: `http://192.168.0.17:3001/api/fetch/community/${params.communityName}`,
+                url: `http://10.162.4.11:3001/api/fetch/community/${params.communityName}`,
             }).then(response => {
-                console.log('The main user is:');
-                console.log(props.mainUser.uniqueUserId);
                 let inCommunity = _.find(response.data.community.members, member => member.uniqueUserId === props.mainUser.uniqueUserId);
-                console.log('This is the result for "inc community":');
-                console.log(inCommunity);
                 if(response.data.community === null) {
                     swal(
                         'Uh Oh!',
@@ -68,9 +64,6 @@ function CommunityChat(props) {
                     history.goBack(1);
                 }
                 else if(!inCommunity){
-                    console.log(response.data.community.members);
-                    console.log(props.mainUser.uniqueUserId);
-                    console.log(_.find(response.data.community.members, member => member.uniuqeUserId === props.mainUser.uniuqUserId));
                     swal(
                         'Uh Oh',
                         'You must be a member of this community to join the community chatroom',
@@ -81,6 +74,18 @@ function CommunityChat(props) {
                 else {
                     setCommunity(response.data.community); //Set the community in the local state variable to this community. 
                     props.dispatch({type: 'ThemeChange', payload: response.data.community.communityTheme}); //Change the theme to match the community theme.
+                    //Below we will get the socket to join the room
+                    //We emit the joinRoom action and send the username and room name to the server.
+                    socket.emit('joinRoom', {
+                        username: props.mainUser.username,
+                        room: response.data.community.name,
+                    });
+
+                    //Below add the listener for IF the user joins the room. 
+                    socket.on('userJoined', data => {
+                    let message = data.username + ' Joined the chat!';
+                    alert(message);
+        });
                 }
             }).catch(err => {
                 console.log(err.message);
@@ -123,7 +128,7 @@ function CommunityChat(props) {
                         className={classes.avatarLg}
                         alt={`${community.name} avatar`}
                         title={`${community.name} avatar`}
-                        src={`http://192.168.0.17:3001/api/get-photo/${community.avatar}`}
+                        src={`http://10.162.4.11:3001/api/get-photo/${community.avatar}`}
                     />
                     <Typography 
                         variant='body1'
@@ -143,7 +148,9 @@ function CommunityChat(props) {
     }
     else {
         return (
-            <Backdrop>
+            <Backdrop
+                open={true} 
+            >
                 <CircularProgress 
                     color='primary'
                 />
