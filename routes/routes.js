@@ -2253,5 +2253,32 @@ router.route('/api/add/community/text/post').post((req, res) => {
     }
 });
 //------------------------------------------------------------------------------------------------------
-
+//The route below will handle deleting a message from a chatroom. We need the community and uniqueMessageId as our arguments. 
+router.route('/api/delete/chat/msg').post((req, res) => {
+    try {
+        Community.findOne({name: req.body.community}, (err, community) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('erroe');
+            }
+            else {
+                community.chatRoom.messages = _.reject(community.chatRoom.messages, msg => msg.uniqueMessageId === req.body.uniqueMessageId);
+                community.save(err => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        res.status(200).json({community: community});
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//----------------------------------------------------------------------------------------------------------------
 module.exports = router;

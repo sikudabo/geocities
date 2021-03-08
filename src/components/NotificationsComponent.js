@@ -44,7 +44,7 @@ function NotificationsComponent(props) {
         else {
             return axios({
                 method: 'GET',
-                url: `http://192.168.0.17:3001/api/grab/user/${props.mainUser.uniqueUserId}`
+                url: `http://10.162.4.11:3001/api/grab/user/${props.mainUser.uniqueUserId}`
             }).then(response => {
                 props.dispatch({type: 'user/updateUser', payload: response.data.user});
                 props.dispatch({type: 'ThemeChange', payload: response.data.user.profileTheme});
@@ -79,7 +79,7 @@ function NotificationsComponent(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.17:3001/api/delete/notification',
+            url: 'http://10.162.4.11:3001/api/delete/notification',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -119,7 +119,7 @@ function NotificationsComponent(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.17:3001/api/follow/request/choice',
+            url: 'http://10.162.4.11:3001/api/follow/request/choice',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -168,7 +168,7 @@ function NotificationsComponent(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.17:3001/api/accept/reject/community/join',
+            url: 'http://10.162.4.11:3001/api/accept/reject/community/join',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -250,7 +250,7 @@ function NotificationsComponent(props) {
                                             >
                                                 <ListItemAvatar>
                                                     <Avatar 
-                                                        src={`http://192.168.0.17:3001/api/get/avatar/by/id/${notification.uniqueSenderId}`}
+                                                        src={`http://10.162.4.11:3001/api/get/avatar/by/id/${notification.uniqueSenderId}`}
                                                         alt={`${notification.sender}`}
                                                         title={`${notification.sender}`}
                                                     />
@@ -291,7 +291,7 @@ function NotificationsComponent(props) {
                                             >
                                                 <ListItemAvatar>
                                                     <Avatar 
-                                                        src={`http://192.168.0.17:3001/api/get/avatar/by/id/${notification.uniqueSenderId}`}
+                                                        src={`http://10.162.4.11:3001/api/get/avatar/by/id/${notification.uniqueSenderId}`}
                                                         alt={`${notification.sender}`}
                                                         title={`${notification.sender}`}
                                                     />
@@ -332,7 +332,7 @@ function NotificationsComponent(props) {
                                             >
                                                 <ListItemAvatar>
                                                     <Avatar 
-                                                        src={`http://192.168.0.17:3001/api/get/avatar/by/community/name/${notification.community}`}
+                                                        src={`http://10.162.4.11:3001/api/get/avatar/by/community/name/${notification.community}`}
                                                         alt={`${notification.sender}`}
                                                         title={`${notification.sender}`}
                                                     />
@@ -373,7 +373,7 @@ function NotificationsComponent(props) {
                                             >
                                                 <ListItemAvatar>
                                                     <Avatar 
-                                                        src={`http://192.168.0.17:3001/api/get/avatar/by/id/${notification.uniqueSenderId}`}
+                                                        src={`http://10.162.4.11:3001/api/get/avatar/by/id/${notification.uniqueSenderId}`}
                                                         alt={`${notification.sender}`}
                                                         title={`${notification.sender}`}
                                                     />
@@ -414,7 +414,7 @@ function NotificationsComponent(props) {
                                             >
                                                 <ListItemAvatar>
                                                     <Avatar 
-                                                        src={`http://192.168.0.17:3001/api/get/avatar/by/id/${notification.uniqueSenderId}`}
+                                                        src={`http://10.162.4.11:3001/api/get/avatar/by/id/${notification.uniqueSenderId}`}
                                                         alt={`${notification.sender}`}
                                                         title={`${notification.sender}`}
                                                     />
@@ -453,7 +453,7 @@ function NotificationsComponent(props) {
                                             >
                                                 <ListItemAvatar>
                                                     <Avatar 
-                                                        src={`http://192.168.0.17:3001/api/get/avatar/by/id/${notification.uniqueSenderId}`}
+                                                        src={`http://10.162.4.11:3001/api/get/avatar/by/id/${notification.uniqueSenderId}`}
                                                         alt={`${notification.sender}`}
                                                         title={`${notification.sender}`}
                                                         style={{
@@ -527,7 +527,7 @@ function NotificationsComponent(props) {
                                             >
                                                 <ListItemAvatar>
                                                     <Avatar 
-                                                        src={`http://192.168.0.17:3001/api/get/avatar/by/id/${notification.uniqueSenderId}`}
+                                                        src={`http://10.162.4.11:3001/api/get/avatar/by/id/${notification.uniqueSenderId}`}
                                                         alt={`${notification.sender}`}
                                                         title={`${notification.sender}`}
                                                         style={{
@@ -633,7 +633,7 @@ function NotificationsComponent(props) {
                                             >
                                                 <ListItemAvatar>
                                                     <Avatar 
-                                                        src={`http://192.168.0.17:3001/api/get/avatar/by/id/${notification.uniqueSenderId}`}
+                                                        src={`http://10.162.4.11:3001/api/get/avatar/by/id/${notification.uniqueSenderId}`}
                                                         alt={`${notification.sender}`}
                                                         title={`${notification.sender}`}
                                                     />

@@ -136,7 +136,7 @@ function TopBar(props) {
                             onClick={changeAnchorEl}
                         />
                         <Menu 
-                            open={anchorEl !== null}
+                            open={Boolean(anchorEl)}
                             anchorEl={anchorEl}
                             onClose={menuClose}
                             keepMounted 

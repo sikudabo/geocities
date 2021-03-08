@@ -21,6 +21,7 @@ const cors = require('cors');
 const nodemailer = require('nodemailer');
 const sslRedirect = require('heroku-ssl-redirect');
 const routes = require('./routes/routes');
+const Community = require('./models/CommunityModel');
 
 //This is a comment
 
@@ -71,16 +72,39 @@ const io = require('socket.io').listen(server);
 io.on('connection', socket => {
     console.log(`Connected to socket: ${socket.id}`);
 
+    //This will handle a disconnection for us. 
     socket.on('disconnect', () => {
         console.log(`${socket.id} has disconnected!`);
     });
 
+    //This will handle a new user joining a room. 
     socket.on('joinRoom', data => {
         console.log(`${data.username} has joined ${data.room} chat`);
         let room = data.room;
         socket.join(room);
         io.to(room).emit('userJoined', {
             username: data.username,
+        });
+    });
+
+    //This will handle sending a message to the clients within a room once we receive it on the server.
+    socket.on('sendMsg', data => {
+        Community.findOne({name: data.community}, (err, community) => {
+            if(err) {
+                console.log(err.message);
+            }
+            else {
+                console.log(`The community is: ${community}`);
+                community.chatRoom.messages.push(data);
+                community.save(err => {
+                    if(err) {
+                        console.log(err.message);
+                    }
+                    else {
+                        io.to(data.community).emit('newMsg', community);
+                    }
+                });
+            }
         });
     });
 });
