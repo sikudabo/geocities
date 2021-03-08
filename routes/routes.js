@@ -2281,4 +2281,175 @@ router.route('/api/delete/chat/msg').post((req, res) => {
     }
 });
 //----------------------------------------------------------------------------------------------------------------
+//The route below will handle updating the community title. 
+router.route('/api/update/community/title').post((req, res) => {
+    try {
+        Community.updateOne({name: req.body.community}, {$set: {title: req.body.title}}, (err, result) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                Community.findOne({name: req.body.community}, (err, community) => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        res.status(200).json({community: community});
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//--------------------------------------------------------------------------------------------------------
+//The route below will handle updating the community description!
+router.route('/api/update/community/description').post((req, res) => {
+    try {
+        Community.updateOne({name: req.body.community}, {$set: {description: req.body.description}}, (err, result) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                Community.findOne({name: req.body.community}, (err, community) => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        res.status(200).json({community: community});
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//---------------------------------------------------------------------------------------------------------
+//The route below will handle upating a new avatar for a community and deleting the old one. 
+router.route('/api/update/community/avatar').post(uploads.single('avatar'), (req, res) => {
+    try {
+        Community.updateOne({name: req.body.community}, {$set: {avatar: req.file.filename}}, (err, result) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                gfs.remove({ filename: req.body.filename, root: 'uploads' }, (err, gridStore) => {
+                    if (err) {
+                        console.log('Error deleting file from GridFs when user tried to delete a media post');
+                        console.log(err);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        Community.findOne({name: req.body.community}, (err, community) => {
+                            if(err) {
+                                console.log(err.message);
+                                res.status(500).send('error');
+                            }
+                            else {
+                                res.status(200).json({community: community});
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//--------------------------------------------------------------------------------------------------------------
+//The route below will handle updating the community theme color 
+router.route('/api/update/community/theme').post((req, res) => {
+    try {
+        Community.updateOne({name: req.body.community}, {$set: {communityTheme: req.body.theme}}, (err, result) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                Community.findOne({name: req.body.community}, (err, community) => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        res.status(200).json({community: community});
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//-------------------------------------------------------------------------------------------------------
+//The route below will handle updating the community privacy.
+router.route('/api/update/community/privacy').post((req, res) => {
+    try {
+        Community.updateOne({name: req.body.community}, {$set: {communityPrivacy: req.body.communityPrivacy}}, (err, result) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                Community.findOne({name: req.body.community}, (err, community) => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        res.status(200).json({community: community});
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//----------------------------------------------------------------
+//The route below will handle changing and updating the community topics. 
+router.route('/api/update/community/topics').post((req, res) => {
+    try {
+        Community.updateOne({name: req.body.community}, {$set: {topics: req.body.topics}}, (err, result) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                Community.findOne({name: req.body.community}, (err, community) => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        res.status(200).json({community: community});
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//-------------------------------------------------------------------------------------
 module.exports = router;

@@ -37,6 +37,13 @@ import Accordion from '@material-ui/core/Accordion';
 import AccordionSummary from '@material-ui/core/AccordionSummary';
 import AccordionDetails from '@material-ui/core/AccordionDetails';
 import ChevronDownIcon from '@material-ui/icons/ExpandMore';
+import CameraIcon from '@material-ui/icons/CameraAlt';
+import { SwatchesPicker } from 'react-color';
+import Checkbox from '@material-ui/core/Checkbox';
+import FormControl from '@material-ui/core/FormControl';
+import FormLabel from '@material-ui/core/FormLabel';
+import FormControlLabel from '@material-ui/core/FormControlLabel';
+import FormGroup from '@material-ui/core/FormGroup';
 
 function TabPanel(props) {
     //This component will serve as the panel for each individual tab.
@@ -81,6 +88,17 @@ function a11yProps(index) {
         'aria-controls': `tabpanel-${index}`,
     };
 }
+
+const communityTopics = [
+    'Accounting', 'Activism', 'Animals And Pets', 'Art', 'Astrology', 'Athletes', 'Aviation', 'Bars', 'Baseball', 'Beauty And Makeup', 'Biking', 'Black Lives Matter', 'Brands/Products', 'Business', 'Careers', 'Cars And Motor Vehicles', 
+    'Celebrity', 'College Baseball', 'College Basketball', 'College Football', 'Computer Science', 'Crafts And DYI', 'Crossfit', 'Crypto', 'Culture Race And Ethnicity', 'Dancing', 'Day Trading', 'Documentaries','Economics',
+    'Education', 'Electronics', 'Entertainment', 'Ethics And Philosophy', 'Family And Relationships', 'Fashion', 'Filming', 'Fitness And Nutrition', 'Food And Drink', 'Funny/Humor',
+    'Gaming', 'Gender', 'GeoCities', 'Greek Life', 'Hair', 'Health', 'History', 'Hobbies', 'Hockey', 'Home And Garden', 'Investing', 'International Culture', 'Internet Culture', 'Intramural Sports', 'Latin Culture', 'Marijuna', 'Marketplace And Deals',
+    'Mature Themes And Adult Content', 'Medical And Mental Health', 'Meditation', "Men's Health", 'Military', 'Movies', 'Music', 'NBA', 'NFL', 'NHL', 'Nursing', 'Only Fans',
+    'Outdoors And Nature', 'Partying', 'People', 'Personal Connections', 'Photography', 'Podcasts And Streamers', 'Politics', 'Pop Culture', 'Programming', 'Public Policy', 'Reading Writing And Literature', 
+    'Religion And Spirituality', 'Robinhood Trading', 'Rowing', 'Running', 'Science', 'Sexual Health And Orientation', 'Side Hustle', 'Sports', 'Soccer', 'Social Justice', 'Software Engineering', 'Streaming', 'Tabletop Games', 'Television', 'Television Personalities', 'Theatre', 'Track & Field', 'Volleyball',
+    "Women's Health", 'World News', 'Working Out/Gym', 'Work/Labor',
+];
 
 
 function Community(props) {
@@ -144,6 +162,10 @@ function Community(props) {
     const [videoCaption, setVideoCaption] = useState(null); //Variable and setter for the caption for a video post. 
     const [postLink, setPostLink] = useState(''); //This variable will store the link post link. 
     const [editTitleText, setEditTitleText] = useState(''); //Variable and setter to change the community title in settings. 
+    const [editDescriptionText, setEditDescriptionText] = useState(''); //Variable and setter to edit the community description text. 
+    const [avatarEdit, setAvatarEdit] = useState(null); //Getter and setter that will alter an avatar when the moderator updaetes it. 
+    const [themeEdit, setThemeEdit] = useState('#00143C'); //Variable and setter for the community theme.
+    const [topics, setTopics] = useState([]); //Community topics.
     const [makingEdit, setMakingEdit] = useState(false); //Will disable buttons when we make an edit. 
     const regularExpressions = {
         urlRegex: /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i,
@@ -517,6 +539,12 @@ function Community(props) {
         setUploadPhoto(resizedPhoto);
     }
 
+    async function handleAvatarChange(e) {
+        let file = e.target.files[0];
+        let resizedPhoto = await resizerFunction(file);
+        setAvatarEdit(resizedPhoto);
+    }
+
     function handlePhotoUpload() {
         //Function that will handle sending an uploaded photo to the server after resizing it.
         //Might need to make some edits here since the photo will be community-based
@@ -760,13 +788,262 @@ function Community(props) {
                     'success',
                 );
             }).catch(err => {
+                console.log(err.message);
                 setMakingEdit(false);
                 swal(
                     'Uh Oh!',
                     'There was an error editing the community title',
                     'error',
                 );
-            })
+            });
+        }
+    }
+
+    function updateDescription() {
+        //This function will handle updating a community description. 
+        setMakingEdit(true);
+        
+        if(editDescriptionText.length < 10) {
+            setMakingEdit(false);
+            swal(
+                'Uh Oh!',
+                'The community description must be at least 10 characters long!',
+                'error',
+            ); 
+            return false;
+        }
+        else if(editDescriptionText.length > 300) {
+            setMakingEdit(false);
+            swal(
+                'Uh Oh!',
+                'The community description can only be up to 300 characters long',
+                'error',
+            );
+            return false;
+        }
+        else {
+            let data = {
+                description: editDescriptionText,
+                community: community.name,
+            }
+
+            return axios({
+                method: 'POST',
+                url: 'http://10.162.4.11:3001/api/update/community/description',
+                data: data,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then(response => {
+                setCommunity(response.data.community);
+                setMakingEdit(false);
+                setEditDescriptionText('');
+                swal(
+                    'Great!',
+                    'Successfully updated the community description!',
+                    'success',
+                );
+            }).catch(err => {
+                console.log(err.message);
+                swal(
+                    'Uh Oh!',
+                    'There was an error updating the community description!',
+                    'error',
+                );
+                setMakingEdit(false);
+            });
+        }
+    }
+
+    function updateAvatar() {
+        //This function will handle updating the avatar for the user. 
+        setMakingEdit(true);
+
+        if(avatarEdit === null) {
+            swal(
+                'Uh Oh!',
+                'You must select a photo to update the community avatar!',
+                'error',
+            );
+            setMakingEdit(false);
+            return false;
+        }
+        else {
+            let fd = new FormData();
+            fd.append('community', community.name);
+            fd.append('filename', community.avatar);
+            fd.append('avatar', avatarEdit, 'avataredit.jpg');
+
+            return axios({
+                method: 'POST',
+                url: 'http://10.162.4.11:3001/api/update/community/avatar',
+                data: fd,
+                headers: {
+                    'Content-Type': 'multipart/form-data',
+                },
+            }).then(response => {
+                swal(
+                    'Great!',
+                    'Successfully updated the community avatar photo!',
+                    'success',
+                );
+                setCommunity(response.data.community);
+                setAvatarEdit(null);
+                setMakingEdit(false);
+            }).catch(err => {
+                console.log(err.message);
+                swal(
+                    'Uh Oh!',
+                    'There was an error updating the avatar for your community!',
+                    'error',
+                );
+                setMakingEdit(false);
+            });
+        }
+    }
+
+    function updateTheme() {
+        //This function will handle updating the theme for a community. 
+        setMakingEdit(true);
+
+        let data = {
+            community: community.name,
+            theme: themeEdit,
+        };
+
+        return axios({
+            method: 'POST',
+            url: 'http://10.162.4.11:3001/api/update/community/theme',
+            data: data,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then(response => {
+            setCommunity(response.data.community);
+            props.dispatch({type: 'ThemeChange', payload: response.data.community.communityTheme}); //Update the theme to match the community theme.
+            swal(
+                'Great!',
+                'You successfully udated the community theme color!',
+                'success',
+            );
+            setMakingEdit(false);
+        }).catch(err => {
+            console.log(err.message);
+            swal(
+                'Uh Oh!',
+                'There was an error updating the community theme color!',
+                'error',
+            );
+            setMakingEdit(false);
+        });
+    }
+
+    function updatePrivacy() {
+        setMakingEdit(true);
+        
+        let thisPrivacy;
+        
+        if(community.communityPrivacy === 'public') {
+            thisPrivacy = 'private';
+        }
+        else {
+            thisPrivacy = 'public';
+        }
+
+        let data = {
+            communityPrivacy: thisPrivacy,
+            community: community.name,
+        };
+
+        return axios({
+            method: 'POST',
+            url: 'http://10.162.4.11:3001/api/update/community/privacy',
+            data: JSON.stringify(data),
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then(response => {
+            setCommunity(response.data.community);
+            swal(
+                'Great!',
+                'You successfully updated the community privacy!',
+                'success',
+            );
+            setMakingEdit(false);
+        }).catch(err => {
+            console.log(err.message);
+            swal(
+                'Uh Oh!',
+                'There was an error updating the community privacy',
+                'error',
+            );
+            setMakingEdit(false);
+        });
+    }
+
+    function handleTopicsChange(e) {
+        //This function will add topics to the topics array. It will remove the topic if it is unchecked.
+        if(e.target.checked) {
+            if(topics.length <= 9) {
+                setTopics(topics => [...topics, e.target.value]);
+            }
+            else {
+                swal(
+                    'Uh Oh!',
+                    'You can only select up to 10 topics!',
+                    'error',
+                );
+            }
+        }
+        else if(!e.target.checked) {
+            setTopics(topics.filter(topic => topic !== e.target.value));
+        }
+    }
+
+    function updateTopics() {
+        //This function will handle updating the topics within a community. 
+        setMakingEdit(true);
+
+        if(topics.length < 1) {
+            swal(
+                'Uh Oh!',
+                'You must select at least one relevant topic for this community!',
+                'error',
+            );
+            setMakingEdit(false);
+            return false;
+        }
+        else {
+            let data = JSON.stringify({
+                topics: topics,
+                community: community.name,
+            });
+
+            return axios({
+                method: 'POST',
+                url: 'http://10.162.4.11:3001/api/update/community/topics',
+                data: data,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then(response => {
+                setCommunity(response.data.community);
+                setTopics([]);
+                swal(
+                    'Great!',
+                    'You successfully updated the topics for your community!',
+                    'success',
+                );
+                setMakingEdit(false);
+            }).catch(err => {
+                console.log(err.message);
+                swal(
+                    'Uh Oh!',
+                    'There was an error updating the community topics!',
+                    'error',
+                );
+                setMakingEdit(false);
+            });
         }
     }
 
@@ -1518,54 +1795,238 @@ function Community(props) {
                             </div>
                         </TabPanel>
                         {/* This is the end of the tab panel for the about section. Now it is time to add the  tab panel for the settings, which only the moderator can see. */}
-                        {props.mainUser.uniqueUserId === community.moderator.uniqueUserId &&
-                            <TabPanel 
-                                value={2} 
-                                index={curTab2} 
+                        <TabPanel 
+                            value={2} 
+                            index={curTab2} 
+                        >
+                            <div>
+                                <Typography 
+                                    variant='h4' 
+                                    component='h4'
+                                    align='center' 
+                                >
+                                    Settings 
+                                </Typography>
+                            </div>
+                            <Divider />
+                            <div>
+                                <Typography 
+                                    variant='subtitle2' 
+                                    component='small' 
+                                    color={(editTitleText.length < 10 || editTitleText.length > 75) ? 'error' : 'default'}
+                                    align='center'
+                                >
+                                    {editTitleText.length}/75
+                                </Typography>
+                                <TextField 
+                                    variant='outlined' 
+                                    color='primary' 
+                                    label='Community title' 
+                                    helperText='Change the community title. Must be between 10 and 75 characters long' 
+                                    placeholder={community.title}
+                                    value={editTitleText} 
+                                    onChange={e => setEditTitleText(e.target.value)} 
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                    fullWidth 
+                                />
+                                <Button 
+                                    variant='contained' 
+                                    color='primary' 
+                                    onClick={updateTitle}
+                                    disabled={makingEdit}
+                                >
+                                    {makingEdit ? <CircularProgress /> : 'Update title'}
+                                </Button>
+                            </div>
+                            <Divider />
+                            <div 
+                                style={{
+                                    marginTop: 30,
+                                }}
                             >
-                                <div>
-                                    <Typography 
-                                        variant='h4' 
-                                        component='h4'
-                                        align='center' 
-                                    >
-                                        Settings 
-                                    </Typography>
-                                </div>
-                                <Divider />
-                                <div>
-                                    <Typography 
-                                        variant='subtitle2' 
-                                        component='small' 
-                                        color={(editTitleText.length < 10 || editTitleText.length > 75) ? 'error' : 'default'}
-                                        align='center'
-                                    >
-                                        {editTitleText.length}/75
-                                    </Typography>
-                                    <TextField 
-                                        variant='outlined' 
-                                        color='primary' 
-                                        label='Community title' 
-                                        helperText='Change the community title. Must be between 10 and 75 characters long' 
-                                        placeholder={community.title}
-                                        value={editTitleText} 
-                                        onChange={e => setEditTitleText(e.target.value)} 
-                                        InputLabelProps={{
-                                            shrink: true,
-                                        }}
-                                        fullWidth 
+                                <Typography 
+                                    variant='subtitle2'
+                                    component='small'
+                                    color={(editDescriptionText.length < 10 || editDescriptionText.length > 300) ? 'error' : 'default'}
+                                    align='center' 
+                                >
+                                    {editDescriptionText.length}/300
+                                </Typography>
+                                <TextField 
+                                    variant='outlined' 
+                                    color='primary' 
+                                    label='Community descriptiom' 
+                                    helperText='Change the community description. Must be between 10 and 300 characters long' 
+                                    placeholder={community.description}
+                                    value={editDescriptionText} 
+                                    onChange={e => setEditDescriptionText(e.target.value)} 
+                                    InputLabelProps={{
+                                        shrink: true,
+                                    }}
+                                    rows={3}
+                                    multiline
+                                    fullWidth 
+                                />
+                                <Button 
+                                    variant='contained' 
+                                    color='primary' 
+                                    onClick={updateDescription}
+                                    disabled={makingEdit}
+                                >
+                                    {makingEdit ? <CircularProgress /> : 'Update title'}
+                                </Button>
+                            </div>
+                            <Divider />
+                            <div 
+                                style={{
+                                    marginTop: 40,
+                                }}
+                            >
+                                <Typography 
+                                className={classes.topMarg} 
+                                variant='body1' 
+                                component='p'
+                                >
+                                    Update community avatar photo!
+                                </Typography>
+                                <label 
+                                    className={classes.topMarg}
+                                    html-for='avatar' 
+                                    style={{
+                                        margin: 'auto',
+                                    }}
+                                >
+                                    <input 
+                                        className={classes.input}
+                                        id='avatar'
+                                        name='avatar ' 
+                                        type='file'
+                                        accept='image/jpeg, image/jpg, image/png'
+                                        onChange={handleAvatarChange}
+                                        required 
                                     />
                                     <Button 
-                                        variant='contained' 
+                                        component='span'
                                         color='primary' 
-                                        onClick={updateTitle}
-                                        disabled={makingEdit}
+                                        variant='contained' 
                                     >
-                                        {makingEdit ? <CircularProgress /> : 'Update title'}
+                                        <CameraIcon />
                                     </Button>
-                                </div>
-                            </TabPanel>
-                        }
+                                </label>
+                                <br/>
+                                <Button 
+                                    variant='contained' 
+                                    color='primary' 
+                                    style={{
+                                        marginTop: 15,
+                                    }}
+                                    onClick={updateAvatar}
+                                    disabled={makingEdit}
+                                >
+                                    {makingEdit ? <CircularProgress /> : 'Update Avatar'}
+                                </Button>
+                            </div>
+                            <Divider />
+                            <div 
+                                style={{
+                                    marginTop: 40,
+                                }}
+                            >
+                                <Typography 
+                                    variant='subtitle2'
+                                    component='small' 
+                                >
+                                    Select a theme color for this community {themeEdit}!
+                                </Typography>
+                                <SwatchesPicker 
+                                    color={themeEdit} 
+                                    onChange={color => setThemeEdit(color.hex)} 
+                                    colors={[
+                                        ['#00143C', '#2471A3', '#3498DB'],
+                                        ['#641E16', '#C0392B', '#E74C3C'],
+                                        ['#0E6655', '#45B39D', '#58D68D'],
+                                        ['#5B2C6F', '#8E44AD', '#C39BD3'],
+                                        ['#BA4A00', '#DC7633', '#E67E22'],
+                                        ['#000000', '#34495E', '#7F8C8D'],
+                                    ]}
+                                />
+                                <Button 
+                                    style={{
+                                        marginTop: 20,
+                                    }}
+                                    variant='contained' 
+                                    color='primary' 
+                                    disabled={makingEdit} 
+                                    onClick={updateTheme}
+                                >
+                                    {makingEdit ? <CircularProgress /> : 'Update Community Theme'} 
+                                </Button>
+                            </div>
+                            <Divider /> 
+                            <div 
+                                style={{
+                                    marginTop: 40,
+                                }}
+                            >
+                                <Button 
+                                    variant='contained'
+                                    color='primary' 
+                                    disabled={makingEdit} 
+                                    onClick={updatePrivacy} 
+                                >
+                                    {community.communityPrivacy === 'public' ? 'Make community private' : 'Make community public'}
+                                </Button>
+                            </div>
+                            <Divider />
+                            <div 
+                                style={{
+                                    marginTop: 40,
+                                }}
+                            >
+                                <FormControl
+                                    component='fieldset' 
+                                >
+                                    <FormLabel 
+                                        component='legend' 
+                                    >
+                                        Select at least 1 community topic. You can choose up to 10 (required)
+                                    </FormLabel>
+                                    <FormGroup 
+                                        column 
+                                    >
+                                        {communityTopics.map((topic, index) => (
+                                            <FormControlLabel 
+                                                key={index.toString()}
+                                                value={topic}
+                                                onChange={handleTopicsChange}
+                                                label={topic}
+                                                labelPlacement='end' 
+                                                control={
+                                                    <Checkbox 
+                                                        color='primary' 
+                                                        checked={topics.includes(topic)}
+                                                    />
+                                                }
+                                            />
+                                        ))}
+                                    </FormGroup>
+                                </FormControl>
+                                <br />
+                                <Button 
+                                    style={{
+                                        marginTop: 20,
+                                    }}
+                                    variant='contained' 
+                                    color='primary' 
+                                    onClick={updateTopics} 
+                                    disabled={makingEdit} 
+                                >
+                                    {makingEdit ? <CircularProgress /> : 'Update community topics'}
+                                </Button>
+                            </div>
+                        </TabPanel>
                     </Grid>
                 }
                 {/* End of the Grid for the main sections of the community page */}
