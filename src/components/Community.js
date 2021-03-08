@@ -9,6 +9,8 @@ import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
+import ListItemText from '@material-ui/core/ListItemText';
+import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Divider from '@material-ui/core/Divider';
 import Button from '@material-ui/core/Button';
 import axios from 'axios';
@@ -31,6 +33,10 @@ import CommunityPostsCard from './CommunityPostsCard';
 import NonUserCommunityPostsCard from './NonUserCommunityPostsCard';
 import Resizer from 'react-image-file-resizer';
 import TextField from '@material-ui/core/TextField';
+import Accordion from '@material-ui/core/Accordion';
+import AccordionSummary from '@material-ui/core/AccordionSummary';
+import AccordionDetails from '@material-ui/core/AccordionDetails';
+import ChevronDownIcon from '@material-ui/icons/ExpandMore';
 
 function TabPanel(props) {
     //This component will serve as the panel for each individual tab.
@@ -137,6 +143,8 @@ function Community(props) {
     const [videoUploading, setVideoUploading] = useState(null); //Variable and setter to disable button while video is uploading. 
     const [videoCaption, setVideoCaption] = useState(null); //Variable and setter for the caption for a video post. 
     const [postLink, setPostLink] = useState(''); //This variable will store the link post link. 
+    const [editTitleText, setEditTitleText] = useState(''); //Variable and setter to change the community title in settings. 
+    const [makingEdit, setMakingEdit] = useState(false); //Will disable buttons when we make an edit. 
     const regularExpressions = {
         urlRegex: /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i,
     }; //This will store the regular expressions to make sure link posts have valid url's. 
@@ -709,6 +717,57 @@ function Community(props) {
             );
             setJoinSending(false);
         });
+    }
+
+    function updateTitle() {
+        //This function will call the server to update a community title. 
+        if(editTitleText.length < 10) {
+            swal(
+                'Uh Oh!',
+                'The title of the community must be at least 10 characters long!',
+                'error',
+            );
+            return false;
+        }
+        else if(editTitleText.length > 75) {
+            swal(
+                'Uh Oh!',
+                'The community title cannot be more than 75 characters long',
+                'error',
+            );
+            return false;
+        }
+        else {
+            let data = {
+                community: community.name,
+                title: editTitleText,
+            };
+
+            return axios({
+                method: 'POST',
+                url: 'http://10.162.4.11:3001/api/update/community/title',
+                data: data,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then(response => {
+                setMakingEdit(false);
+                setEditTitleText('');
+                setCommunity(response.data.community);
+                swal(
+                    'Great!',
+                    'Successfully udated community.',
+                    'success',
+                );
+            }).catch(err => {
+                setMakingEdit(false);
+                swal(
+                    'Uh Oh!',
+                    'There was an error editing the community title',
+                    'error',
+                );
+            })
+        }
     }
 
     if(community !== null) {
@@ -1298,6 +1357,215 @@ function Community(props) {
                                 </div>
                             }
                         </TabPanel>
+                        {/* This is the end of the tab for posts. Now, we need a tab for the about section of the community*/}
+                        <TabPanel 
+                            value={1}
+                            index={curTab2} 
+                        >
+                            <div 
+                                style={{
+                                    margin: 'auto',
+                                    maxWidth: 600,
+                                    textAlign: 'center',
+                                }}
+                            >
+                                <List>
+                                    {/* First list item that shows the community moderator */}
+                                    <ListItem
+                                        style={{
+                                            cursor: 'pointer',
+                                        }}
+                                        onClick={e => history.push(`/geouser/${community.moderator.uniqueUserId}`)}
+                                        alignItems='flex-start'
+                                    >
+                                        <ListItemAvatar>
+                                            <Avatar 
+                                                src={`http://10.162.4.11:3001/api/get/avatar/by/id/${community.moderator.uniqueUserId}`}
+                                                title={`${community.moderator.username}`}
+                                                alt={`${community.moderator.username}`} 
+                                                style={{
+                                                    cursor: 'pointer',
+                                                }}
+                                            />
+                                        </ListItemAvatar>
+                                        <ListItemText 
+                                            primary={
+                                                <div>
+                                                    <Typography 
+                                                        variant='h6' 
+                                                        component='h6' 
+                                                    >
+                                                        Moderator 
+                                                    </Typography>
+                                                    <Typography 
+                                                        variant='subtitle1' 
+                                                        component='span' 
+                                                        color='textSecondary'
+                                                    >
+                                                        {community.moderator.username}
+                                                    </Typography>
+                                                </div>
+                                            }
+                                        />
+                                    </ListItem>
+                                    <Divider />
+                                    {/* End of the community moderator list item */}
+                                    {/* Begin the community description section */} 
+                                    <ListItem>
+                                        <div>
+                                            <Typography 
+                                                variant='h6'
+                                                component='h6' 
+                                                align='center' 
+                                            >
+                                                Description
+                                            </Typography>
+                                            <br></br>
+                                            <Typography 
+                                                variant='body1' 
+                                                component='p' 
+                                            >
+                                                {community.description}
+                                            </Typography>
+                                        </div>
+                                    </ListItem>
+                                    <Divider />
+                                    {/* End of the section for the community description */}
+                                    {/* Begin the ListItem for the number of members in the community */}
+                                    <ListItem>
+                                        <ListItemText 
+                                            primary={
+                                                <div>
+                                                    <Typography 
+                                                        variant='body1' 
+                                                        component='p'
+                                                        align='center' 
+                                                    >
+                                                        {community.members.length} members 
+                                                    </Typography>
+                                                </div>
+                                            }
+                                        />
+                                    </ListItem>
+                                    <Divider />
+                                    {/* End of ListItem showing the number of users in a community */}
+                                    {/* Begin the section showing a list of topics within the community */}
+                                    <Typography 
+                                        variant='h6' 
+                                        component='h6' 
+                                        align='center' 
+                                    >
+                                        Topics
+                                    </Typography>
+                                    <List>
+                                        {community.topics.map((topic, index) => (
+                                            <ListItem 
+                                                key={index.toString()} 
+                                                alignItems='flexStart' 
+                                            >
+                                                <ListItemText 
+                                                    primary={
+                                                        <div>
+                                                            <Typography 
+                                                                variant='body1' 
+                                                                component='p'
+                                                                align='center' 
+                                                            >
+                                                                {topic}
+                                                            </Typography>
+                                                        </div>
+                                                    }
+                                                />
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                    {/* End of the section for the community topics */}
+                                </List>
+                                {/* End of the list, but add community rules below */}
+                                {community.rules.length > 0 &&
+                                    <div>
+                                        <Divider />
+                                        <Typography 
+                                            variant='h6' 
+                                            component='h6' 
+                                            align='center' 
+                                        >
+                                            Rules 
+                                        </Typography>
+                                        {community.rules.map((item, index) => (
+                                            <div 
+                                                key={index} 
+                                            >
+                                                <Accordion>
+                                                    <AccordionSummary
+                                                        expandIcon={<ChevronDownIcon />}
+                                                    >
+                                                        {item.rule}
+                                                    </AccordionSummary>
+                                                    <AccordionDetails>
+                                                        <Typography 
+                                                            variant='body1' 
+                                                            component='p' 
+                                                        >
+                                                            {item.reason}
+                                                        </Typography>
+                                                    </AccordionDetails>
+                                                </Accordion>
+                                            </div>
+                                        ))}
+                                    </div>
+                                }
+                            </div>
+                        </TabPanel>
+                        {/* This is the end of the tab panel for the about section. Now it is time to add the  tab panel for the settings, which only the moderator can see. */}
+                        {props.mainUser.uniqueUserId === community.moderator.uniqueUserId &&
+                            <TabPanel 
+                                value={2} 
+                                index={curTab2} 
+                            >
+                                <div>
+                                    <Typography 
+                                        variant='h4' 
+                                        component='h4'
+                                        align='center' 
+                                    >
+                                        Settings 
+                                    </Typography>
+                                </div>
+                                <Divider />
+                                <div>
+                                    <Typography 
+                                        variant='subtitle2' 
+                                        component='small' 
+                                        color={(editTitleText.length < 10 || editTitleText.length > 75) ? 'error' : 'default'}
+                                        align='center'
+                                    >
+                                        {editTitleText.length}/75
+                                    </Typography>
+                                    <TextField 
+                                        variant='outlined' 
+                                        color='primary' 
+                                        label='Community title' 
+                                        helperText='Change the community title. Must be between 10 and 75 characters long' 
+                                        placeholder={community.title}
+                                        value={editTitleText} 
+                                        onChange={e => setEditTitleText(e.target.value)} 
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                        fullWidth 
+                                    />
+                                    <Button 
+                                        variant='contained' 
+                                        color='primary' 
+                                        onClick={updateTitle}
+                                        disabled={makingEdit}
+                                    >
+                                        {makingEdit ? <CircularProgress /> : 'Update title'}
+                                    </Button>
+                                </div>
+                            </TabPanel>
+                        }
                     </Grid>
                 }
                 {/* End of the Grid for the main sections of the community page */}
