@@ -44,6 +44,8 @@ import FormControl from '@material-ui/core/FormControl';
 import FormLabel from '@material-ui/core/FormLabel';
 import FormControlLabel from '@material-ui/core/FormControlLabel';
 import FormGroup from '@material-ui/core/FormGroup';
+import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
+
 
 function TabPanel(props) {
     //This component will serve as the panel for each individual tab.
@@ -99,6 +101,11 @@ const communityTopics = [
     'Religion And Spirituality', 'Robinhood Trading', 'Rowing', 'Running', 'Science', 'Sexual Health And Orientation', 'Side Hustle', 'Sports', 'Soccer', 'Social Justice', 'Software Engineering', 'Streaming', 'Tabletop Games', 'Television', 'Television Personalities', 'Theatre', 'Track & Field', 'Volleyball',
     "Women's Health", 'World News', 'Working Out/Gym', 'Work/Labor',
 ];
+
+const userFilterOptions = createFilterOptions({
+    matchFrom: 'any',
+    stringify: option => option.firstName + ' ' + option.lastName + ' ' + option.username,
+}); //Filter options to search for users to potentially block. 
 
 
 function Community(props) {
@@ -167,6 +174,10 @@ function Community(props) {
     const [themeEdit, setThemeEdit] = useState('#00143C'); //Variable and setter for the community theme.
     const [topics, setTopics] = useState([]); //Community topics.
     const [makingEdit, setMakingEdit] = useState(false); //Will disable buttons when we make an edit. 
+    const [allUsers, setAllUsers] = useState([]); //Variable and setter for the users to search when we want to block one. 
+    const [selectedUser, setSelectedUser] = useState(null); //Variable and setter for the user we choose to block
+    const [newRule, setNewRule] = useState(''); //This is the variable and setter when a user adds a new rule. 
+    const [newReason, setNewReason] = useState(''); //Variable and setter for the new reason for a new rule. 
     const regularExpressions = {
         urlRegex: /^(?:(?:(?:https?|ftp):)?\/\/)(?:\S+(?::\S*)?@)?(?:(?!(?:10|127)(?:\.\d{1,3}){3})(?!(?:169\.254|192\.168)(?:\.\d{1,3}){2})(?!172\.(?:1[6-9]|2\d|3[0-1])(?:\.\d{1,3}){2})(?:[1-9]\d?|1\d\d|2[01]\d|22[0-3])(?:\.(?:1?\d{1,2}|2[0-4]\d|25[0-5])){2}(?:\.(?:[1-9]\d?|1\d\d|2[0-4]\d|25[0-4]))|(?:(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)(?:\.(?:[a-z\u00a1-\uffff0-9]-*)*[a-z\u00a1-\uffff0-9]+)*(?:\.(?:[a-z\u00a1-\uffff]{2,})))(?::\d{2,5})?(?:[/?#]\S*)?$/i,
     }; //This will store the regular expressions to make sure link posts have valid url's. 
@@ -221,6 +232,8 @@ function Community(props) {
             }).then(response => {
                 if(response.data.community) {
                     setCommunity(response.data.community);
+                    //Set allUsers 
+                    setAllUsers(response.data.allUsers);
                     props.dispatch({type: 'ThemeChange', payload: response.data.community.communityTheme}); //Update the theme to match the community theme.
                     props.dispatch({type: 'visitorPosts/updatePosts', payload: response.data.posts}); //Update the posts to match what a visitor viewing these posts will see.
                     //Now determine if the mainUser is in the blockList, and re-route to the previous page if they are. 
@@ -1047,6 +1060,196 @@ function Community(props) {
         }
     }
 
+    function blockUser(uniqueUserId, username) {
+        //This function will handle blocking a user.
+        if(uniqueUserId === community.moderator.uniqueUserId) {
+            swal(
+                'Uh Oh',
+                'You cannot block yourself from a community you moderate!',
+                'error',
+            );
+            return false;
+        }
+        else {
+            let data = JSON.stringify({
+                username: username,
+                uniqueUserId: uniqueUserId,
+                community: community.name,
+            });
+    
+            return axios({
+                method: 'POST',
+                url: 'http://10.162.4.11:3001/api/block/community/user',
+                data: data,
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }).then(response => {
+                swal(
+                    'Great!',
+                    'You successfully blocked this user from your community',
+                    'success',
+                );
+    
+                setCommunity(response.data.community);
+            }).catch(err => {
+                console.log(err.message);
+                swal(
+                    'Uh Oh!',
+                    'There was an error blocking this user from the community!',
+                    'error',
+                );
+            });
+        }
+    }
+
+    function unBlockUser(uniqueUserId, username) {
+        //This function will handle unblocking a user from the community. TODO: Disable Button while updating.
+        setMakingEdit(true);
+
+        let data = JSON.stringify({
+            uniqueUserId: uniqueUserId,
+            username: username,
+            community: community.name,
+        });
+
+        return axios({
+            method: 'POST',
+            url: 'http://10.162.4.11:3001/api/unblock/community/user',
+            data: data,
+            headers: {
+                'Content-Type': 'application/json',
+            },
+        }).then(response => {
+            swal(
+                'Great!',
+                'You successfully unblocked that user from your community!',
+                'success',
+            )
+            setCommunity(response.data.community);
+            setMakingEdit(false);
+        }).catch(err => {
+            console.log(err.message);
+            swal(
+                'Uh Oh!',
+                'There was an error trying to unblock that user from your community!',
+                'error',
+            );
+            setMakingEdit(false);
+        });
+    }
+
+    function deleteRule(rule) {
+        //This function will be responsible for deleting a rule. 
+        setMakingEdit(true);
+
+        let data = JSON.stringify({
+            rule: rule,
+            community: community.name,
+        });
+
+        return axios({
+            method: 'POST',
+            url: 'http://10.162.4.11:3001/api/delete/community/rule',
+            data: data,
+            headers: {
+                'Content-Type': 'application/json',
+            }
+        }).then(response => {
+            swal(
+                'Great!',
+                'You successfully deleted that rule from your community!',
+                'success',
+            );
+            setCommunity(response.data.community);
+            setMakingEdit(false);
+        }).catch(err => {
+            console.log(err.message);
+            swal(
+                'Uh Oh!',
+                'There was an error deleting that rule from the community!',
+                'error',
+            );
+            setMakingEdit(false);
+        });
+    }
+
+    function addRule() {
+        //This function will handle adding a new rule to the community.
+        setMakingEdit(true);
+
+        if(newRule.trim() === '') {
+            swal(
+                'Uh Oh!',
+                'You must enter a new rule!',
+                'error',
+            );
+            setMakingEdit(false);
+            return false;
+        }
+        else if(newRule.length > 100) {
+            swal(
+                'Uh Oh!',
+                'The rule cannot be longer than 100 characters!',
+                'error',
+            );
+            setMakingEdit(false);
+            return false;
+        }
+        else if(newReason.trim() === '') {
+            swal(
+                'Uh Oh!',
+                'You must enter a reason for your rule!',
+                'error',
+            );
+            setMakingEdit(false);
+            return false;
+        }
+        else if(newReason.length > 300) {
+            swal(
+                'Uh Oh!',
+                'The reason for your rule cannot be greater than 300 characters!',
+                'error',
+            );
+            setMakingEdit(false);
+            return false;
+        }
+        else {
+            let data = JSON.stringify({
+                rule: newRule,
+                reason: newReason,
+                community: community.name,
+            });
+
+            return axios({
+                method: 'POST',
+                url: 'http://10.162.4.11:3001/api/add/community/rule',
+                data: data, 
+                headers: {
+                    'Content-Type': 'application/json',
+                }
+            }).then(response => {
+                swal(
+                    'Great!',
+                    'You successfully added a new community rule!',
+                    'success',
+                );
+                setCommunity(response.data.community);
+                setMakingEdit(false);
+                setNewRule('');
+                setNewReason('');
+            }).catch(err => {
+                console.log(err.message);
+                swal(
+                    'Uh Oh!',
+                    'There was an error adding that new rule to the community!',
+                    'error',
+                );
+                setMakingEdit(false);
+            }); 
+        }
+    }
+
     if(community !== null) {
         return (
             <Grid 
@@ -1773,7 +1976,11 @@ function Community(props) {
                                             <div 
                                                 key={index} 
                                             >
-                                                <Accordion>
+                                                <Accordion
+                                                    style={{
+                                                        marginBottom: index < community.rules.length - 1 ? 20 : 0,
+                                                    }}
+                                                >
                                                     <AccordionSummary
                                                         expandIcon={<ChevronDownIcon />}
                                                     >
@@ -2025,6 +2232,235 @@ function Community(props) {
                                 >
                                     {makingEdit ? <CircularProgress /> : 'Update community topics'}
                                 </Button>
+                            </div>
+                            <Divider />
+                            <div 
+                                style={{
+                                    marginTop: 40,
+                                }}
+                            >
+                                <Typography 
+                                    variant='h6' 
+                                    component='h6' 
+                                    align='center' 
+                                >
+                                    Block User
+                                </Typography>
+                                <Autocomplete 
+                                    value={selectedUser}
+                                    filterOptions={userFilterOptions}
+                                    options={allUsers}
+                                    getOptionLabel={option => option.firstName + ' ' + option.lastName}
+                                    renderOption={option => (
+                                        <ListItem 
+                                            alignItems='flex-start' 
+                                            onClick={() => blockUser(option.uniqueUserId, option.username)}
+                                        >
+                                            <ListItemAvatar>
+                                                <Avatar 
+                                                    src={`http://10.162.4.11:3001/api/get-photo/${option.avatar}`}
+                                                    alt={`${option.username}`}
+                                                    title={`${option.username}`} 
+                                                />
+                                            </ListItemAvatar>
+                                            <ListItemText 
+                                                primary={
+                                                    <Typography 
+                                                        variant='h6' 
+                                                        component='h6' 
+                                                    >
+                                                        {option.username}
+                                                    </Typography>
+                                                }
+                                                secondary={
+                                                    <Typography 
+                                                        component='small'
+                                                        color='textSecondary' 
+                                                    >
+                                                        {option.firstName} {option.lastName}
+                                                    </Typography>
+                                                }
+                                            />
+                                        </ListItem>
+                                    )}
+                                    renderInput={params => (
+                                        <TextField 
+                                            {...params} 
+                                            color='primary'
+                                            variant='outlined' 
+                                            label='Block user' 
+                                            placeholder='Search users'
+                                            helperText='Search for a GeoCities user to block'
+                                            InputLabelProps={{
+                                                shrink: true,
+                                            }}
+                                            fullWidth 
+                                            required 
+                                        />
+                                    )}
+                                />
+                            </div>
+                            <Divider />
+                            <div 
+                                style={{
+                                    marginTop: 40,
+                                }}
+                            >
+                                {community.blockList.length > 0 &&
+                                    <List>
+                                        {community.blockList.map((user, index) => (
+                                            <ListItem 
+                                                key={index}
+                                                alignItems='flexStart' 
+                                            >
+                                                <ListItemAvatar>
+                                                    <Avatar 
+                                                        src={`http://10.162.4.11:3001/api/get/avatar/by/id/${user.uniqueUserId}`}
+                                                        title={`${user.username}`}
+                                                        alt={`${user.username}`} 
+                                                    />
+                                                </ListItemAvatar>
+                                                <Button 
+                                                    variant='contained' 
+                                                    color='primary' 
+                                                    onClick={e => unBlockUser(user.uniqueUserId, user.username)}
+                                                    disabled={makingEdit}
+                                                >
+                                                    {makingEdit ? <CircularProgress /> : 'Unblock user'}
+                                                </Button>
+                                            </ListItem>
+                                        ))}
+                                    </List>
+                                }
+                            </div>
+                            <Divider />
+                            {/* End of the section for unblocking a user. Now we need a section that can help us delete rules */}
+                            <div 
+                                style={{
+                                    marginTop: 40,
+                                }}
+                            >
+                                <Typography 
+                                    variant='h6' 
+                                    component='h6' 
+                                    align='center' 
+                                >
+                                    Delete rules 
+                                </Typography>
+                                {community.rules.length > 0 &&
+                                    <List>
+                                        {community.rules.map((item, index) => (
+                                            <div>
+                                                <ListItem 
+                                                    key={index} 
+                                                    alignItems='flex-start' 
+                                                    style={{
+                                                        marginBottom: index < community.rules.length - 1 ? 15 : 0,
+                                                    }}
+                                                >
+                                                    <ListItemText 
+                                                        secondary={
+                                                            <Typography 
+                                                                variant='subtitle1' 
+                                                                color='textSecondary' 
+                                                                component='span' 
+                                                            >
+                                                                {item.rule}
+                                                            </Typography>
+                                                        }
+                                                    />
+                                                    <Button 
+                                                        color='primary' 
+                                                        onClick={e => deleteRule(item.rule)}
+                                                        disabled={makingEdit}
+                                                    >
+                                                        delete rule 
+                                                    </Button>
+                                                </ListItem>
+                                            </div>
+                                        ))}
+                                    </List>
+                                }
+                            </div>
+                            <Divider />
+                            {/* End of the section for deleting rules. Now we need to create the section to ADD rules */}
+                            <div 
+                                style={{
+                                    marginTop: 40,
+                                }}
+                            >
+                                <Typography 
+                                    variant='h6' 
+                                    component='h6' 
+                                    align='center' 
+                                >
+                                    Create new rule 
+                                </Typography>
+                                <div 
+                                    style={{
+                                        marginTop: 20,
+                                    }}
+                                >
+                                    <Typography 
+                                        variant='subtitle2' 
+                                        component='small' 
+                                        color={newRule.length > 100 ? 'error' : 'default'} 
+                                        align='center'
+                                    >
+                                        {newRule.length}/100
+                                    </Typography>
+                                    <TextField 
+                                        value={newRule}
+                                        onChange={e => setNewRule(e.target.value)}
+                                        label='Add new rule' 
+                                        placeholder='Add a new rule for the community'
+                                        helperText='New rule can be a max of 100-characters' 
+                                        color='primary' 
+                                        variant='outlined' 
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                        fullWidth 
+                                    />
+                                    <Typography 
+                                        variant='subtitle2' 
+                                        component='small' 
+                                        color={newReason.length > 300 ? 'error' : 'default'} 
+                                        align='center' 
+                                        style={{
+                                            marginTop: 35,
+                                        }}
+                                    >
+                                        {newReason.length}/300
+                                    </Typography>
+                                    <TextField 
+                                        value={newReason} 
+                                        onChange={e => setNewReason(e.target.value)} 
+                                        label='Add a reason for the rule'
+                                        placeholder='You must enter a reason for this rule' 
+                                        helperText='The reason can be up to 300 characters long'
+                                        color='primary' 
+                                        variant='outlined' 
+                                        InputLabelProps={{
+                                            shrink: true,
+                                        }}
+                                        multiline 
+                                        row={4} 
+                                        fullWidth 
+                                    />
+                                    <br />
+                                    <Button 
+                                        style={{
+                                            marginTop: 20,
+                                        }}
+                                        color='primary' 
+                                        variant='contained' 
+                                        disabled={makingEdit} 
+                                        onClick={addRule}
+                                    >
+                                        {makingEdit ? <CircularProgress /> : 'Add rule'}
+                                    </Button>
+                                </div>
                             </div>
                         </TabPanel>
                     </Grid>

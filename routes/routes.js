@@ -1596,10 +1596,24 @@ router.route('/api/fetch/community/:communityName').get((req, res) => {
                         res.status(500).send('error');
                     }
                     else if(!community) {
-                        res.status(200).json({posts: posts, community: null});
+                        User.find({}, (err, users) => {
+                            if(err) {
+                                res.status(500).send('error');
+                            }
+                            else {
+                                res.status(200).json({posts: posts, community: null, allUsers: users});
+                            }
+                        });
                     }
                     else {
-                        res.status(200).json({posts: posts, community: community});
+                        User.find({}, (err, users) => {
+                            if(err) {
+                                res.status(500).send('error');
+                            }
+                            else {
+                                res.status(200).json({posts: posts, community: community, allUsers: users});
+                            }
+                        });
                     }
                 });
             }
@@ -2452,4 +2466,139 @@ router.route('/api/update/community/topics').post((req, res) => {
     }
 });
 //-------------------------------------------------------------------------------------
+//The route below will handle blocking a user from a community. 
+router.route('/api/block/community/user').post((req, res) => {
+    try {
+        Community.findOne({name: req.body.community}, (err, community) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                if(_.find(community.blockList, user => user.uniqueUserId === req.body.uniqueUserId)) {
+                    console.log(`In the block list we have ${community.blockList}`);
+                    res.status(200).json({community: community});
+                }
+                else {
+                    Community.updateOne({name: req.body.community}, {$push: {blockList: {username: req.body.username, uniqueUserId: req.body.uniqueUserId}}}, (err, result) => {
+                        if(err) {
+                            console.log(err.message);
+                            res.status(500).send('error');
+                        }
+                        else {
+                            User.updateOne({uniqueUserId: req.body.uniqueUserId}, {$pull: {communities: req.body.community}}, (err, fin) => {
+                                if(err) {
+                                    console.log(err.message);
+                                    res.status(500).send('error');
+                                }
+                                else {
+                                    Community.updateOne({name: req.body.community}, {$pull: {members: {uniqueUserId: req.body.uniqueUserId}}}, (err, din) => {
+                                        if(err) {
+                                            console.log(err.message);
+                                            res.status(500).send('error');
+                                        }
+                                        else {
+                                            res.status(200).json({community: community});
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//--------------------------------------------------------------------------------
+//The route below will handle unblocking a user from a community
+router.route('/api/unblock/community/user').post((req, res) => {
+    try {
+        Community.updateOne({name: req.body.community}, {$pull: {blockList: {uniqueUserId: req.body.uniqueUserId}}}, (err, result) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                Community.findOne({name: req.body.community}, (err, community) => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        res.status(200).json({community: community});
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//--------------------------------------------------------------------------------------------------------
+//The route below will be responsible for deleting a rule from a community.
+router.route('/api/delete/community/rule').post((req, res) => {
+    try {
+        Community.updateOne({name: req.body.community}, {$pull: {rules: {rule: req.body.rule}}}, (err, result) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                Community.findOne({name: req.body.community}, (err, community) => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        res.status(200).json({community: community});
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//--------------------------------------------------------------------------------------------------------
+//THe route below will handle adding a new rule to the community. 
+router.route('/api/add/community/rule').post((req, res) => {
+    try {
+        let newRule = {
+            rule: req.body.rule,
+            reason: req.body.reason,
+        };
+
+        Community.updateOne({name: req.body.community}, {$push: {rules: newRule}}, (err, result) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                Community.findOne({name: req.body.community}, (err, community) => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        res.status(200).json({community: community});
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//---------------------------------------------------------------------------------------------------------
 module.exports = router;
