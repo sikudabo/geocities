@@ -49,6 +49,8 @@ app.use(history({
     ]
 }));
 
+
+
 //Now get express "app" to "use" each route within the routes folder.
 //app.use('/', loginRoute); //This is the route that will verify a user based on their username and password.
 //app.use(signupRoute); //This is the route that will save a new user to the database.
@@ -59,9 +61,9 @@ app.get('*', (req, res) => {
 });
 
 //The code below will prevent the process from exiting and freezing the app on an error.
-process.on('uncaughtException', err => {
+/*process.on('uncaughtException', err => {
     console.log(`Uncaught Exception: ${err.message}`)
-});
+});*/
 
 const server = http.createServer(app).listen(app.get('port'), () => {
     console.log(`Listening on port ${app.get('port')}`);

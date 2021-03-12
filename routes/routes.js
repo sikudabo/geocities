@@ -165,7 +165,7 @@ router.route('/api/signup').post(uploads.single('avatar'), (req, res) => {
 
 //The route below will handle grabbing a user within a get request from the database. 
 router.route('/api/grab/user/:uniqueUserId').get((req, res) => {
-    try {
+    console.log(`The uniqueUserId is: ${req.params.uniqueUserId}`);
         let uniqueUserId = req.params.uniqueUserId; //get the userId from params. 
         User.findOne({uniqueUserId: uniqueUserId}, (err, user) => {
             if(err) {
@@ -179,8 +179,11 @@ router.route('/api/grab/user/:uniqueUserId').get((req, res) => {
                 res.status(200).send('user not found');
             }
             else {
+                console.log(`The user communities are ${user.communities}`);
+                let userCommunities = user.communities;
+                console.log('It was able to read user.communities here. ')
                 //Now grab the communities a user belongs to. Test the "members" attribute. 
-                Community.find({name: {$in: user.communities}}, (err, communities) => {
+                Community.find({name: {$in: userCommunities}}, (err, communities) => {
                     if(err) {
                         console.log(err.message);
                         res.status(500).send('error');
@@ -202,11 +205,6 @@ router.route('/api/grab/user/:uniqueUserId').get((req, res) => {
                 });
             }
         });
-    }
-    catch(err) {
-        console.log(err.message);
-        res.status(500).send('error');
-    }
 });
 //------------------------------------------------------------------------------------------------------
 
@@ -2601,4 +2599,117 @@ router.route('/api/add/community/rule').post((req, res) => {
     }
 });
 //---------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------
+router.route('/api/change/username').post((req, res) => {
+    try {
+        //First test to see if the username is taken in DB.
+        User.findOne({username: req.body.username}, (err, tester) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else if(tester) {
+                res.status(200).send('username taken');
+            }
+            else {
+                User.updateOne({uniqueUserId: req.body.uniqueUserId}, {$set: {username: req.body.username}}, (err, din) => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+                            if(err) {
+                                console.log(err.message);
+                                res.status(500).error
+                            }
+                            else {
+                                res.status(200).json({user: user});
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+})
+//----------------------------------------------------------------------------------------------------------
+//The route below will handle movin things --------------------------------------------------
+router.route('/api/change/password').post((req, res) => {
+    try {
+        User.updateOne({uniqueUserId: req.body.uniqueUserId}, {$set: {password: req.body.password}}, (err, user) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, result) => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        res.status(200).json({user: result});
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//---------------------------------------------------------------
+router.route('/api/change/email').post((req, res) => {
+    try {
+        User.updateOne({uniqueUserId: req.body.uniqueUserId}, {$set: {email: req.body.email}}, (err, result) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        res.status(200).json({user: user});
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//--------------------------------------------------------------------------------
+//The route below will handle updating the city of a user. 
+router.route('/api/update/user/city').post((req, res) => {
+    User.updateOne({uniqueUserId: req.body.uniqueUserId}, {$set: {city: req.body.city}}, (err, result) => {
+        if(err) {
+            console.log(err.message);
+            res.status(500).end('error');
+        }
+        else {
+            User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+                if(err) {
+                    console.log(err.message);
+                    res.status(500).send('error');
+                }
+                else {
+                    res.status(200).json({user: user});
+                }
+            });
+        }
+    });
+});
+//-------------------------------------------------------------------------------
 module.exports = router;

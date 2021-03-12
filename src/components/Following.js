@@ -90,7 +90,7 @@ function Following(props) {
                                     >
                                         <ListItemAvatar>
                                             <Avatar 
-                                                src={`http://10.162.4.11:3001/api/get/avatar/by/id/${user.uniqueUserId}`}
+                                                src={`http://192.168.0.17:3001/api/get/avatar/by/id/${user.uniqueUserId}`}
                                                 alt={`${user.username}`}
                                                 title={`${user.username}`}
                                             />
