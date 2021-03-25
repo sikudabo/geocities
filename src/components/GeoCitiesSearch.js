@@ -58,7 +58,7 @@ function GeoCitiesSearch(props) {
         else {
             return axios({
                 method: 'GET',
-                url: `http://192.168.0.17:3001/api/fetch/users/${props.mainUser.uniqueUserId}`,
+                url: `https://www.geocities.cc/api/fetch/users/${props.mainUser.uniqueUserId}`,
             }).then(response => {
                 if(response.data.users.length > 0) {
                     setUsers(response.data.users);
@@ -121,7 +121,7 @@ function GeoCitiesSearch(props) {
                                 >
                                     <ListItemAvatar>
                                         <Avatar 
-                                            src={`http://192.168.0.17:3001/api/get-photo/${option.avatar}`}
+                                            src={`https://www.geocities.cc/api/get-photo/${option.avatar}`}
                                             alt={`${option.username}`}
                                             title={`${option.username}`} 
                                         />
@@ -185,7 +185,7 @@ function GeoCitiesSearch(props) {
                                 >
                                     <ListItemAvatar>
                                         <Avatar 
-                                            src={`http://192.168.0.17:3001/api/get-photo/${option.avatar}`}
+                                            src={`https://www.geocities.cc/api/get-photo/${option.avatar}`}
                                             alt={`${option.name} avatar`}
                                             title={`${option.name} avatar`} 
                                         />

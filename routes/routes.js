@@ -11,8 +11,8 @@ const _ = require('underscore');
 const { mdiConsoleNetwork } = require('@mdi/js');
 const axios = require('axios');
 
-//const dbUri = 'mongodb+srv://sikudabo:shooter1@cluster0.zkhru.mongodb.net/tester?retryWrites=true&w=majority';
-const dbUri = 'mongodb://localhost:27017/geocities';
+const dbUri = 'mongodb+srv://sikudabo:shooter1@cluster0.zkhru.mongodb.net/tester?retryWrites=true&w=majority';
+//const dbUri = 'mongodb://localhost:27017/geocities';
 var conn = mongoose.createConnection(dbUri);
 
 conn.once('open', () => {
@@ -2694,6 +2694,111 @@ router.route('/api/change/email').post((req, res) => {
 //The route below will handle updating the city of a user. 
 router.route('/api/update/user/city').post((req, res) => {
     User.updateOne({uniqueUserId: req.body.uniqueUserId}, {$set: {city: req.body.city}}, (err, result) => {
+        if(err) {
+            console.log(err.message);
+            res.status(500).end('error');
+        }
+        else {
+            User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+                if(err) {
+                    console.log(err.message);
+                    res.status(500).send('error');
+                }
+                else {
+                    res.status(200).json({user: user});
+                }
+            });
+        }
+    });
+});
+//-------------------------------------------------------------------------------
+//The code below will handle updating the users geographical state.
+router.route('/api/update/user/state').post((req, res) => {
+    User.updateOne({uniqueUserId: req.body.uniqueUserId}, {$set: {userState: req.body.state}}, (err, result) => {
+        if(err) {
+            console.log(err.message);
+            res.status(500).end('error');
+        }
+        else {
+            User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+                if(err) {
+                    console.log(err.message);
+                    res.status(500).send('error');
+                }
+                else {
+                    res.status(200).json({user: user});
+                }
+            });
+        }
+    });
+});
+//------------------------------------------------------------------------------
+//The route below will handle updating the college of the user. 
+router.route('/api/update/user/college').post((req, res) => {
+    User.updateOne({uniqueUserId: req.body.uniqueUserId}, {$set: {college: req.body.college}}, (err, result) => {
+        if(err) {
+            console.log(err.message);
+            res.status(500).end('error');
+        }
+        else {
+            User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+                if(err) {
+                    console.log(err.message);
+                    res.status(500).send('error');
+                }
+                else {
+                    res.status(200).json({user: user});
+                }
+            });
+        }
+    });
+});
+//-------------------------------------------------------------------------------
+//The route below will handle updating a users interests
+router.route('/api/update/user/interests').post((req, res) => {
+    User.updateOne({uniqueUserId: req.body.uniqueUserId}, {$set: {interests: req.body.interests}}, (err, result) => {
+        if(err) {
+            console.log(err.message);
+            res.status(500).end('error');
+        }
+        else {
+            User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+                if(err) {
+                    console.log(err.message);
+                    res.status(500).send('error');
+                }
+                else {
+                    res.status(200).json({user: user});
+                }
+            });
+        }
+    });
+});
+//--------------------------------------------------------------------------------
+//The route below will update a users' Twitter handle 
+router.route('/api/update/user/twitter').post((req, res) => {
+    User.updateOne({uniqueUserId: req.body.uniqueUserId}, {$set: {twitterHandle: req.body.twitterHandle}}, (err, result) => {
+        if(err) {
+            console.log(err.message);
+            res.status(500).end('error');
+        }
+        else {
+            User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+                if(err) {
+                    console.log(err.message);
+                    res.status(500).send('error');
+                }
+                else {
+                    res.status(200).json({user: user});
+                }
+            });
+        }
+    });
+});
+//--------------------------------------------------------------------------------
+//The route below will handle updating a users Instagrom handle.
+router.route('/api/update/user/instagram').post((req, res) => {
+    User.updateOne({uniqueUserId: req.body.uniqueUserId}, {$set: {instaHandle: req.body.instaHandle}}, (err, result) => {
         if(err) {
             console.log(err.message);
             res.status(500).end('error');

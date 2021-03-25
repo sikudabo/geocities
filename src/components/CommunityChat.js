@@ -44,7 +44,7 @@ const useStyles = makeStyles(() => ({
 function CommunityChat(props) {
     const classes = useStyles(); //Custom component classes. 
     const [community, setCommunity]= useState(null); //Variable and setter for the community we are in.
-    const [socket] = useSocket('http://192.168.0.17:3001/'); //useSocket hook to maintain a connection.
+    const [socket] = useSocket('https://www.geocities.cc/'); //useSocket hook to maintain a connection.
     const [chatMsg, setChatMsg] = useState(''); //The message that could be sent to the server for another chat. 
     const params = useParams();
     const history = useHistory();
@@ -55,7 +55,7 @@ function CommunityChat(props) {
         if(props.mainUser) {
             return axios({
                 method: 'GET',
-                url: `http://192.168.0.17:3001/api/fetch/community/${params.communityName}`,
+                url: `https://www.geocities.cc/api/fetch/community/${params.communityName}`,
             }).then(response => {
                 let inCommunity = _.find(response.data.community.members, member => member.uniqueUserId === props.mainUser.uniqueUserId);
                 if(response.data.community === null) {
@@ -215,7 +215,7 @@ function CommunityChat(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.17:3001/api/delete/chat/msg',
+            url: 'https://www.geocities.cc/api/delete/chat/msg',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -260,7 +260,7 @@ function CommunityChat(props) {
                         className={classes.avatarLg}
                         alt={`${community.name} avatar`}
                         title={`${community.name} avatar`}
-                        src={`http://192.168.0.17:3001/api/get-photo/${community.avatar}`}
+                        src={`https://www.geocities.cc/api/get-photo/${community.avatar}`}
                     />
                     <Typography 
                         variant='body1'
@@ -311,7 +311,7 @@ function CommunityChat(props) {
                                     >
                                         <ListItemAvatar>
                                             <Avatar 
-                                                src={`http://192.168.0.17:3001/api/get/avatar/by/id/${msg.uniqueUserId}`}
+                                                src={`https://www.geocities.cc/api/get/avatar/by/id/${msg.uniqueUserId}`}
                                                 title={`${msg.username}`}
                                                 alt={`${msg.username}`} 
                                                 onClick={e => handleUserPush(msg.uniqueUserId)}
