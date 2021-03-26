@@ -155,7 +155,7 @@ function TopBar(props) {
                 {props.mainUser !== null &&
                     <div>
                         <Avatar 
-                            src={`https://www.geocities.cc/api/get-photo/${props.mainUser.avatar}`}
+                            src={`http://10.162.93.179:3001/api/get-photo/${props.mainUser.avatar}`}
                             title={`${props.mainUser.username}`}
                             alt={`${props.mainUser.username}`}
                             style={{

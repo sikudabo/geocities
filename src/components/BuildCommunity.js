@@ -259,7 +259,7 @@ function BuildCommunity(props) {
 
             return axios({
                 method: 'POST',
-                url: 'https://www.geocities.cc/api/build/community',
+                url: 'http://10.162.93.179:3001/api/build/community',
                 data: fd,
                 headers: {
                     'Content-Type': 'multipart/form-data',

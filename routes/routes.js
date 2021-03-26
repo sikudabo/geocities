@@ -11,8 +11,8 @@ const _ = require('underscore');
 const { mdiConsoleNetwork } = require('@mdi/js');
 const axios = require('axios');
 
-const dbUri = 'mongodb+srv://sikudabo:shooter1@cluster0.zkhru.mongodb.net/tester?retryWrites=true&w=majority';
-//const dbUri = 'mongodb://localhost:27017/geocities';
+//const dbUri = 'mongodb+srv://sikudabo:shooter1@cluster0.zkhru.mongodb.net/tester?retryWrites=true&w=majority';
+const dbUri = 'mongodb://localhost:27017/geocities';
 var conn = mongoose.createConnection(dbUri);
 
 conn.once('open', () => {
@@ -198,7 +198,16 @@ router.route('/api/grab/user/:uniqueUserId').get((req, res) => {
                                 res.status(200).json({user: user, posts: []});
                             }
                             else {
-                                res.status(200).json({user: user, posts: posts, communities: communities});
+                                //Now, grab each user in the DB.
+                                User.find({}, (err, users) => {
+                                    if(err) {
+                                        console.log(err.message);
+                                        res.status(500).send('error');
+                                    }
+                                    else {
+                                        res.status(200).json({user: user, posts: posts, communities: communities, users: users});
+                                    }
+                                });
                             }
                         });
                     }
@@ -2817,4 +2826,257 @@ router.route('/api/update/user/instagram').post((req, res) => {
     });
 });
 //-------------------------------------------------------------------------------
+//THe route below will handle the user updating the link to their YouTube channel.
+router.route('/api/update/user/youtube').post((req, res) => {
+    User.updateOne({uniqueUserId: req.body.uniqueUserId}, {$set: {youtubeChannel: req.body.youtubeChannel}}, (err, result) => {
+        if(err) {
+            console.log(err.message);
+            res.status(500).end('error');
+        }
+        else {
+            User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+                if(err) {
+                    console.log(err.message);
+                    res.status(500).send('error');
+                }
+                else {
+                    res.status(200).json({user: user});
+                }
+            });
+        }
+    });
+});
+//--------------------------------------------------------------------------------
+//The route below will handle updating a users' profile theme color.
+router.route('/api/update/user/theme').post((req, res) => {
+    User.updateOne({uniqueUserId: req.body.uniqueUserId}, {$set: {profileTheme: req.body.profileTheme}}, (err, result) => {
+        if(err) {
+            console.log(err.message);
+            res.status(500).end('error');
+        }
+        else {
+            User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+                if(err) {
+                    console.log(err.message);
+                    res.status(500).send('error');
+                }
+                else {
+                    res.status(200).json({user: user});
+                }
+            });
+        }
+    });
+});
+//----------------------------------------------------------------------------------
+//The route below will handle updating the bio for a user.
+router.route('/api/update/user/bio').post((req, res) => {
+    User.updateOne({uniqueUserId: req.body.uniqueUserId}, {$set: {bio: req.body.bio}}, (err, result) => {
+        if(err) {
+            console.log(err.message);
+            res.status(500).end('error');
+        }
+        else {
+            User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+                if(err) {
+                    console.log(err.message);
+                    res.status(500).send('error');
+                }
+                else {
+                    res.status(200).json({user: user});
+                }
+            });
+        }
+    });
+});
+//---------------------------------------------------------------------------------
+//The route below will handle deleting a users' avatar.
+router.route('/api/update/user/avatar').post(uploads.single('avatar'), (req, res) => {
+    try {
+        gfs.remove({ filename: req.body.oldAvatar, root: 'uploads' }, (err, gridStore) => {
+            if (err) {
+                console.log('Error deleting file from GridFs when user tried to delete a media post');
+                console.log(err);
+                res.status(500).send('error');
+            }
+            else {
+                User.updateOne({uniqueUserId: req.body.uniqueUserId}, {$set: {avatar: req.file.filename}}, (err, result) => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+                            if(err) {
+                                console.log(err.message);
+                                res.status(500).send('error');
+                            }
+                            else {
+                                res.status(200).json({user: user});
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log('Error updating users profile picture!');
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//---------------------------------------------------------------------------------
+//The route below will be responsible for updating the profile privacy of a user and their posts. 
+router.route('/api/update/user/privacy').post((req, res) => {
+    User.updateOne({uniqueUserId: req.body.uniqueUserId}, {$set: {profilePrivacy: req.body.privacy}}, (err, result) => {
+        if(err) {
+            console.log(err.message);
+            res.status(500).end('error');
+        }
+        else {
+            //Update each post that belongs to this user.
+            Post.updateMany({uniqueUserId: req.body.uniqueUserId}, {$set: {privacy: req.body.privacy}}, (err, resutls) => {
+                if(err) {
+                    console.log(err.message);
+                    res.status(500).send('error');
+                }
+                else {
+                    User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+                        if(err) {
+                            console.log(err.message);
+                            res.status(500).send('error');
+                        }
+                        else {
+                            res.status(200).json({user: user});
+                        }
+                    });
+                }
+            });
+        }
+    });
+});
+//---------------------------------------------------------------------------------
+//The route below will handle allowoing a GeoUser to block another GeoUser.
+router.route('/api/update/user/block').post((req, res) => {
+    try {
+        User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                if(_.find(user.blockList, bUser => bUser.uniqueUserId === req.body.blockUniqueUserId)) {
+                    res.status(200).json({user: user});
+                }
+                else if(req.body.blockUniqueUserId === req.body.uniqueUserId) {
+                    res.status(200).send('yourself');
+                }
+                else {
+                    let newBlock = {
+                        uniqueUserId: req.body.blockUniqueUserId,
+                        username: req.body.username,
+                    };
+
+                    User.updateOne({uniqueUserId: req.body.uniqueUserId}, {$push: {blockList: newBlock}}, (err, result) => {
+                        if(err) {
+                            console.log(err.message);
+                            res.status(500).send('error');
+                        }
+                        else {
+                            Post.updateMany({uniqueUserId: req.body.uniqueUserId}, {$push: {blockList: newBlock}}, (err, resulty) => {
+                                if(err) {
+                                    console.log(err.message);
+                                    res.status(500).send('error');
+                                }
+                                else {
+                                    User.updateOne({uniqueUserId: req.body.uniqueUserId}, {$pull: {followers: {uniqueUserId: req.body.blockUniqueUserId}}}, (err, resultgkg) => {
+                                        if(err) {
+                                            console.log(err.message);
+                                            res.status(500).send('error');
+                                        }
+                                        else {
+                                            User.updateOne({uniqueUserId: req.body.uniqueUserId}, {$pull: {following: {uniqueUserId: req.body.blockUniqueUserId}}}, (err, resultx) => {
+                                                if(err) {
+                                                    console.log(err.message);
+                                                    res.status(500).send('error');
+                                                }
+                                                else {
+                                                    User.updateOne({uniqueUserId: req.body.blockUniqueUserId}, {$pull: {following: {uniqueUserId: req.body.uniqueUserId}}}, (err, resultb) => {
+                                                        if(err) {
+                                                            console.log(err.message);
+                                                            res.status(500).send('error');
+                                                        }
+                                                        else {
+                                                            User.updateOne({uniqueUserId: req.body.blockUniqueUserId}, {$pull: {followers: {uniqueUserId: req.body.uniqueUserId}}}, (err, resultq) => {
+                                                                if(err) {
+                                                                    console.log(err.message);
+                                                                    res.status(500).send('error');
+                                                                }
+                                                                else {
+                                                                    User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+                                                                        if(err) {
+                                                                            console.log(err.message);
+                                                                            res.status(500).send('error');
+                                                                        }
+                                                                        else {
+                                                                            res.status(200).json({user: user});
+                                                                        }
+                                                                    });
+                                                                }
+                                                            });
+                                                        }
+                                                    });
+                                                }
+                                            });
+                                        }
+                                    });
+                                }
+                            });
+                        }
+                    });
+                }
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//---------------------------------------------------------------------------------
+//The route below will handle unblocking a user. 
+router.route('/api/update/user/unblock').post((req, res) => {
+    try {
+        User.updateOne({uniqueUserId: req.body.uniqueUserId}, {$pull: {blockList: {uniqueUserId: req.body.blockUniqueUserId}}}, (err, result) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                Post.updateMany({uniqueUserId: req.body.uniqueUserId}, {$pull: {blockList: {uniqueUserId: req.body.blockUniqueUserId}}}, (err, resulty) => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        User.findOne({uniqueUserId: req.body.uniqueUserId}, (err, user) => {
+                            if(err) {
+                                console.log(err.message);
+                                res.status(500).send('error');
+                            }
+                            else {
+                                res.status(200).json({user: user});
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+})
+//---------------------------------------------------------------------------------
 module.exports = router;

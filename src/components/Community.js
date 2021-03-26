@@ -228,7 +228,7 @@ function Community(props) {
         if(true) {
             return axios({
                 method: 'GET',
-                url: `https://www.geocities.cc/api/fetch/community/${params.communityName}`,
+                url: `http://10.162.93.179:3001/api/fetch/community/${params.communityName}`,
             }).then(response => {
                 if(response.data.community) {
                     setCommunity(response.data.community);
@@ -278,7 +278,7 @@ function Community(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/public/join/community',
+            url: 'http://10.162.93.179:3001/api/public/join/community',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -324,7 +324,7 @@ function Community(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/community/join/request',
+            url: 'http://10.162.93.179:3001/api/community/join/request',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -394,7 +394,7 @@ function Community(props) {
 
             return axios({
                 method: 'post',
-                url: 'https://www.geocities.cc/api/add/community/text/post',
+                url: 'http://10.162.93.179:3001/api/add/community/text/post',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -489,7 +489,7 @@ function Community(props) {
 
             return axios({
                 method: 'post',
-                url: 'https://www.geocities.cc/api/add/community/text/post',
+                url: 'http://10.162.93.179:3001/api/add/community/text/post',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -595,7 +595,7 @@ function Community(props) {
 
             return axios({
                 method: 'POST',
-                url: 'https://www.geocities.cc/api/upload/photo',
+                url: 'http://10.162.93.179:3001/api/upload/photo',
                 data: fd,
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -677,7 +677,7 @@ function Community(props) {
 
             return axios({
                 method: 'POST',
-                url: 'https://www.geocities.cc/api/upload/photo',
+                url: 'http://10.162.93.179:3001/api/upload/photo',
                 data: fd,
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -726,7 +726,7 @@ function Community(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/leave/community',
+            url: 'http://10.162.93.179:3001/api/leave/community',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -786,7 +786,7 @@ function Community(props) {
 
             return axios({
                 method: 'POST',
-                url: 'https://www.geocities.cc/api/update/community/title',
+                url: 'http://10.162.93.179:3001/api/update/community/title',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -842,7 +842,7 @@ function Community(props) {
 
             return axios({
                 method: 'POST',
-                url: 'https://www.geocities.cc/api/update/community/description',
+                url: 'http://10.162.93.179:3001/api/update/community/description',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -889,7 +889,7 @@ function Community(props) {
 
             return axios({
                 method: 'POST',
-                url: 'https://www.geocities.cc/api/update/community/avatar',
+                url: 'http://10.162.93.179:3001/api/update/community/avatar',
                 data: fd,
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -926,7 +926,7 @@ function Community(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/update/community/theme',
+            url: 'http://10.162.93.179:3001/api/update/community/theme',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -970,7 +970,7 @@ function Community(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/update/community/privacy',
+            url: 'http://10.162.93.179:3001/api/update/community/privacy',
             data: JSON.stringify(data),
             headers: {
                 'Content-Type': 'application/json',
@@ -1034,7 +1034,7 @@ function Community(props) {
 
             return axios({
                 method: 'POST',
-                url: 'https://www.geocities.cc/api/update/community/topics',
+                url: 'http://10.162.93.179:3001e/api/update/community/topics',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -1079,7 +1079,7 @@ function Community(props) {
     
             return axios({
                 method: 'POST',
-                url: 'https://www.geocities.cc/api/block/community/user',
+                url: 'http://10.162.93.179:3001e/api/block/community/user',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -1115,7 +1115,7 @@ function Community(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/unblock/community/user',
+            url: 'http://10.162.93.179:3001e/api/unblock/community/user',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -1150,7 +1150,7 @@ function Community(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/delete/community/rule',
+            url: 'http://10.162.93.179:3001e/api/delete/community/rule',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -1223,7 +1223,7 @@ function Community(props) {
 
             return axios({
                 method: 'POST',
-                url: 'https://www.geocities.cc/api/add/community/rule',
+                url: 'http://10.162.93.179:3001/api/add/community/rule',
                 data: data, 
                 headers: {
                     'Content-Type': 'application/json',
@@ -1266,7 +1266,7 @@ function Community(props) {
                     >
                         <Avatar 
                             className={classes.avatarLg} 
-                            src={`https://www.geocities.cc/api/get-photo/${community.avatar}`}
+                            src={`http://10.162.93.179:3001/api/get-photo/${community.avatar}`}
                             alt={`${community.name} avatar`}
                             title={`${community.name} avatar`}
                             variant='square'
@@ -1276,7 +1276,7 @@ function Community(props) {
                         mdUp 
                     >
                         <Avatar 
-                            src={`https://www.geocities.cc/api/get-photo/${community.avatar}`}
+                            src={`http://10.162.93.179:3001/api/get-photo/${community.avatar}`}
                             className={classes.avatarSm} 
                             title={`${community.name} avatar`}
                             alt={`${community.name} avatar`}
@@ -1860,7 +1860,7 @@ function Community(props) {
                                     >
                                         <ListItemAvatar>
                                             <Avatar 
-                                                src={`https://www.geocities.cc/api/get/avatar/by/id/${community.moderator.uniqueUserId}`}
+                                                src={`http://10.162.93.179:3001/api/get/avatar/by/id/${community.moderator.uniqueUserId}`}
                                                 title={`${community.moderator.username}`}
                                                 alt={`${community.moderator.username}`} 
                                                 style={{
@@ -2258,7 +2258,7 @@ function Community(props) {
                                         >
                                             <ListItemAvatar>
                                                 <Avatar 
-                                                    src={`https://www.geocities.cc/api/get-photo/${option.avatar}`}
+                                                    src={`http://10.162.93.179:3001/api/get-photo/${option.avatar}`}
                                                     alt={`${option.username}`}
                                                     title={`${option.username}`} 
                                                 />
@@ -2315,7 +2315,7 @@ function Community(props) {
                                             >
                                                 <ListItemAvatar>
                                                     <Avatar 
-                                                        src={`https://www.geocities.cc/api/get/avatar/by/id/${user.uniqueUserId}`}
+                                                        src={`http://10.162.93.179:3001/api/get/avatar/by/id/${user.uniqueUserId}`}
                                                         title={`${user.username}`}
                                                         alt={`${user.username}`} 
                                                     />
