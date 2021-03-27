@@ -22,6 +22,7 @@ import BuildCommunity from './components/BuildCommunity';
 import Community from './components/Community'
 import CommunityChat from './components/CommunityChat';
 import UserSettings from './components/UserSettings';
+import MessagesComponent from './components/MessagesComponent.js';
 
 function App(props) {
   const theme = createMuiTheme({
@@ -112,6 +113,11 @@ function App(props) {
           <Route 
             component={UserSettings} 
             path='/settings'
+            exact 
+          />
+          <Route 
+            component={MessagesComponent}
+            path='/messages'
             exact 
           />
         </Switch>

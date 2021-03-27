@@ -155,7 +155,7 @@ function TopBar(props) {
                 {props.mainUser !== null &&
                     <div>
                         <Avatar 
-                            src={`http://10.162.93.179:3001/api/get-photo/${props.mainUser.avatar}`}
+                            src={`https://www.geocities.cc/api/get-photo/${props.mainUser.avatar}`}
                             title={`${props.mainUser.username}`}
                             alt={`${props.mainUser.username}`}
                             style={{
@@ -185,6 +185,12 @@ function TopBar(props) {
                                 onClick={e => history.push('/settings')} 
                             >
                                 Settings
+                            </MenuItem>
+                            <Divider />
+                            <MenuItem
+                                onClick={e => history.push('/messages')}
+                            >
+                                Messages
                             </MenuItem>
                             <Divider />
                             <MenuItem

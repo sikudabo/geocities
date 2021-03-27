@@ -140,7 +140,7 @@ function ProfilePage(props) {
             //props.dispatch({type: 'ThemeChange', payload: props.user.profileTheme});
             return axios({
                 method: 'GET',
-                url: `http://10.162.93.179:3001/api/grab/user/${props.user.uniqueUserId}`,
+                url: `https://www.geocities.cc/api/grab/user/${props.user.uniqueUserId}`,
             }).then(response => {
                 if(response.data.user) {
                     props.dispatch({type: 'user/updateUser', payload: response.data.user});
@@ -212,7 +212,7 @@ function ProfilePage(props) {
 
             return axios({
                 method: 'POST',
-                url: 'http://10.162.93.179:3001/api/upload/text/link/post',
+                url: 'https://www.geocities.cc/api/upload/text/link/post',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -312,7 +312,7 @@ function ProfilePage(props) {
 
             return axios({
                 method: 'POST',
-                url: 'http://10.162.93.179:3001/api/upload/photo',
+                url: 'https://www.geocities.cc/api/upload/photo',
                 data: fd,
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -393,7 +393,7 @@ function ProfilePage(props) {
 
             return axios({
                 method: 'POST',
-                url: 'http://10.162.93.179:3001/api/upload/photo',
+                url: 'https://www.geocities.cc/api/upload/photo',
                 data: fd,
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -462,7 +462,7 @@ function ProfilePage(props) {
                         >
                             <Avatar 
                                 className={classes.profileAvatar} 
-                                src={`http://10.162.93.179:3001/api/get-photo/${props.user.avatar}`} 
+                                src={`https://www.geocities.cc/api/get-photo/${props.user.avatar}`} 
                                 title={`${props.user.username}`} 
                                 alt={`${props.user.username}`} 
                             />
@@ -473,7 +473,7 @@ function ProfilePage(props) {
                         >
                             <Avatar 
                                 className={classes.profileAvatarLg}
-                                src={`http://10.162.93.179:3001/api/get-photo/${props.user.avatar}`} 
+                                src={`https://www.geocities.cc/api/get-photo/${props.user.avatar}`} 
                                 title={`${props.user.username}`} 
                                 alt={`${props.user.username}`} 
                             />
@@ -1170,7 +1170,7 @@ function ProfilePage(props) {
                                                 >
                                                     <ListItemAvatar>
                                                         <Avatar 
-                                                            src={`http://10.162.93.179:3001/api/get-photo/${community.avatar}`}
+                                                            src={`https://www.geocities.cc/api/get-photo/${community.avatar}`}
                                                             alt={`${community.name} avatar`}
                                                             title={`${community.name} avatar`}
                                                         />

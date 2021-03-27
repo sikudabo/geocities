@@ -2,6 +2,7 @@ const router = require('express').Router();
 const User = require('../models/UserModel'); //Import the user model for mongoose connectivity.
 const Post = require('../models/PostModel');
 const Community = require('../models/CommunityModel');
+const Thread = require('../models/ThreadModel');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const GridFsStorage = require('multer-gridfs-storage');
@@ -11,8 +12,8 @@ const _ = require('underscore');
 const { mdiConsoleNetwork } = require('@mdi/js');
 const axios = require('axios');
 
-//const dbUri = 'mongodb+srv://sikudabo:shooter1@cluster0.zkhru.mongodb.net/tester?retryWrites=true&w=majority';
-const dbUri = 'mongodb://localhost:27017/geocities';
+const dbUri = 'mongodb+srv://sikudabo:shooter1@cluster0.zkhru.mongodb.net/tester?retryWrites=true&w=majority';
+//const dbUri = 'mongodb://localhost:27017/geocities';
 var conn = mongoose.createConnection(dbUri);
 
 conn.once('open', () => {
@@ -3078,5 +3079,186 @@ router.route('/api/update/user/unblock').post((req, res) => {
         res.status(500).send('error');
     }
 })
+//---------------------------------------------------------------------------------
+//The route below will fetch all users, the threads the user is in, and the user 
+router.route('/api/get/threads/:uniqueUserId').get((req, res) => {
+    try {
+        User.findOne({uniqueUserId: req.params.uniqueUserId}, (err, user) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                Thread.find({}, (err, threads) => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        let myThreads = _.find(threads, curThread => curThread.uniqueUserIds.includes(req.params.uniqueUserId));
+                        User.find({}, (err, users) => {
+                            if(err) {
+                                console.log(err.message);
+                                res.status(500).send('error');
+                            }
+                            else {
+                                console.log(`The users are: ${users}`);
+                                res.status(200).json({user: user, users: users, threads: myThreads});
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//---------------------------------------------------------------------------------
+//The route below will add a direct message to the database and either create a thread or append a message to one.
+router.route('/api/add/dm').post((req, res) => {
+    try {
+        //Check to see if the message was made in a new compose dialog.
+        if(req.body.freshMsg) {
+            Thread.find({}, (err, threads) => {
+                if(err) {
+                    console.log(err.message);
+                    res.status(500).send('error');
+                }
+                else {
+                    //Check to see if the uniqueUserId of the sender and receiver are in a thread. 
+                    let mainThread = _.find(threads, thread => thread.uniqueUserIds.includes(req.body.senderUniqueUserId) && thread.uniqueUserIds.includes(req.body.receiverUniqueUserId));
+                    if(mainThread) {
+                        let newMsg = {
+                            senderUniqueUserId: req.body.senderUniqueUserId,
+                            receiverUniqueUserId: req.body.receiverUniqueUserId,
+                            senderUsername: req.body.senderUsername,
+                            receiverUsername: req.body.receiverUsername,
+                            msg: req.body.msg,
+                            utcTime: req.body.utcTime,
+                            dateString: req.body.dateString,
+                            uniqueMessageId: req.body.uniqueMessageId,
+                        };
+
+                        Thread.updateOne({uniqueThreadId: mainThread.uniqueThreadId}, {$push: {messages: newMsg}, utcTime: Date.now()}, (err, result) => {
+                            if(err) {
+                                console.log(err.message);
+                                res.status(500).send('error');
+                            }
+                            else {
+                                let returnThreads = _.filter(threads, thread => thread.uniqueUserIds.includes(req.body.senderUniqueUserId));
+                                returnThreads = _.sortBy(returnThreads, thread => -thread.utcTime);
+                                User.find({}, (err, users) => {
+                                    if(err) {
+                                        console.log(err.message);
+                                        res.status(500).send('error');
+                                    }
+                                    else {
+                                        res.status(200).json({users: users, threads: returnThreads});
+                                    }
+                                });
+                            }
+                        });
+                    }
+                    else {
+                        //We create a thread if we cannot find a thread with these users. 
+                        let newMsg = {
+                            senderUniqueUserId: req.body.senderUniqueUserId,
+                            receiverUniqueUserId: req.body.receiverUniqueUserId,
+                            senderUsername: req.body.senderUsername,
+                            receiverUsername: req.body.receiverUsername,
+                            msg: req.body.msg,
+                            utcTime: req.body.utcTime,
+                            dateString: req.body.dateString,
+                            uniqueMessageId: req.body.uniqueMessageId,
+                        };
+
+                        let newThread = new Thread({
+                            uniqueThreadId: Date.now() + req.body.senderUniqueUserId + req.body.receiverUniqueUserId + 'thread' + Date.now(),
+                            usernames: [req.body.senderUsername, req.body.receiverUsername],
+                            uniqueUserIds: [req.body.senderUniqueUserId, req.body.receiverUniqueUserId],
+                            utcTime: Date.now(),
+                            messages: [newMsg],
+                        });
+
+                        newThread.save(err => {
+                            if(err) {
+                                console.log(err.message);
+                                res.status(500).send('error');
+                            }
+                            else {
+                                Thread.find({}, (err, threads) => {
+                                    if(err) {
+                                        console.log(err.message);
+                                        res.status(500).send('error');
+                                    }
+                                    else {
+                                        let returnThreads = _.filter(threads, thread => thread.uniqueUserIds.includes(req.body.senderUniqueUserId));
+                                        returnThreads = _.sortBy(returnThreads, thread => -thread.utcTime);
+                                        User.find({}, (err, users) => {
+                                            if(err) {
+                                                console.log(err.message);
+                                                res.status(500).send('error');
+                                            }
+                                            else {
+                                                res.status(200).json({threads: returnThreads, users: users});
+                                            }
+                                        });
+                                    }
+                                });
+                            }
+                        });
+                    }
+                }
+            });
+        }
+        else {
+            let newMsg = {
+                senderUniqueUserId: req.body.senderUniqueUserId,
+                receiverUniqueUserId: req.body.receiverUniqueUserId,
+                senderUsername: req.body.senderUsername,
+                receiverUsername: req.body.receiverUsername,
+                msg: req.body.msg,
+                utcTime: req.body.utcTime,
+                dateString: req.body.dateString,
+                uniqueMessageId: req.body.uniqueMessageId,
+            };
+
+            Thread.updateOne({uniqueThreadId: req.body.targetThread}, {$push: {messages: newMsg}}, (err, result) => {
+                if(err) {
+                    console.log(err.message);
+                    res.status(500).send('error');
+                }
+                else {
+                    Thread.find({}, (err, threads) => {
+                        if(err) {
+                            console.log(err.message);
+                            res.status(500).send('error');
+                        }
+                        else {
+                            let returnThreads = _.filter(threads, thread => thread.uniqueUserIds.includes(req.body.senderUniqueUserId));
+                            returnThreads = _.sortBy(returnThreads, thread => -thread.utcTime);
+                            User.find({}, (err, users) => {
+                                if(err) {
+                                    console.log(err.message);
+                                    res.status(500).send('error');
+                                }
+                                else {
+                                    res.status(200).json({users: users, threads: returnThreads});
+                                }
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
 //---------------------------------------------------------------------------------
 module.exports = router;

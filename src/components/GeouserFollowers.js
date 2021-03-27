@@ -44,7 +44,7 @@ function GeouserFollowers(props) {
         else {
             return axios({
                 method: 'GET',
-                url: `http://10.162.93.179:3001/api/get/geo/followers/${params.uniqueUserId}`,
+                url: `https://www.geocities.cc/api/get/geo/followers/${params.uniqueUserId}`,
             }).then(response => {
                 if(response.data.geoUser) {
                     setGeoUser(response.data.geoUser);
@@ -115,7 +115,7 @@ function GeouserFollowers(props) {
                                 >
                                     <ListItemAvatar>
                                         <Avatar 
-                                            src={`http://10.162.93.179:3001/api/get/avatar/by/id/${user.uniqueUserId}`}
+                                            src={`https://www.geocities.cc/api/get/avatar/by/id/${user.uniqueUserId}`}
                                             alt={`${user.username}`}
                                             title={`${user.username}`} 
                                         />
