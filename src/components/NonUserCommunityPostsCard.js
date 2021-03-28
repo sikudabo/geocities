@@ -144,7 +144,7 @@ export default function NonUserCommunityPostsCard(props) {
                 }
                 avatar={
                     <Avatar 
-                        src={`https://www.geocities.cc/api/get/avatar/by/community/name/${props.post.community}`}
+                        src={`http://192.168.0.17:3001/api/get/avatar/by/community/name/${props.post.community}`}
                         title={`${props.post.username}`}
                         alt={`${props.post.username}`}
                     />
@@ -182,7 +182,7 @@ export default function NonUserCommunityPostsCard(props) {
                 {props.post.type === 'photo' &&
                     <CardMedia 
                         className={classes.media}
-                        image={`https://www.geocities.cc/api/get-photo/${props.post.src}`}
+                        image={`http://192.168.0.17:3001/api/get-photo/${props.post.src}`}
                         title={`Post by ${props.post.username}`}
                         alt='GeoCities photo post'
                     />
@@ -205,7 +205,7 @@ export default function NonUserCommunityPostsCard(props) {
                             type='video'
                             sources={[
                                 {
-                                    src: `https://www.geocities.cc/api/get-video/${props.post.src}`,
+                                    src: `http://192.168.0.17:3001/api/get-video/${props.post.src}`,
                                 }
                             ]}
                             fullscreen={{
@@ -345,7 +345,7 @@ export default function NonUserCommunityPostsCard(props) {
                                         >
                                             <ListItemAvatar>
                                                 <Avatar 
-                                                    src={`https://www.geocities.cc/api/get/avatar/by/id/${comment.uniqueUserId}`}
+                                                    src={`http://192.168.0.17:3001/api/get/avatar/by/id/${comment.uniqueUserId}`}
                                                     title={`${comment.username}`}
                                                     alt={`${comment.username}`} 
                                                     onClick={e => handleUserPush(comment.uniqueUserId)}

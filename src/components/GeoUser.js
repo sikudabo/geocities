@@ -122,7 +122,7 @@ function GeoUser(props) {
             //Call the API to get a public profile view for a user who is not logged in.
             return axios({
                 method: 'GET',
-                url: `https://www.geocities.cc/api/get/public/geo/user/${params.uniqueUserId}`,
+                url: `http://192.168.0.17:3001/api/get/public/geo/user/${params.uniqueUserId}`,
             }).then(response => {
                 if(response.data.geoUser) {
                     //If we were able to get a user, set post and theme globally, and the local geoUser state.
@@ -152,7 +152,7 @@ function GeoUser(props) {
         else if(props.mainUser !== null) {
             return axios({
                 method: 'GET',
-                url: `https://www.geocities.cc/api/get/geo/user/${params.uniqueUserId}/${props.mainUser.uniqueUserId}`,
+                url: `http://192.168.0.17:3001/api/get/geo/user/${params.uniqueUserId}/${props.mainUser.uniqueUserId}`,
             }).then(response => {
                 if(response.data.geoUser && response.data.mainUser) {
                     if(response.data.geoUser.uniqueUserId === props.mainUser.uniqueUserId) {
@@ -208,7 +208,7 @@ function GeoUser(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/follow/user',
+            url: 'http://192.168.0.17:3001/api/follow/user',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -243,7 +243,7 @@ function GeoUser(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/unfollow/user',
+            url: 'http://192.168.0.17:3001/api/unfollow/user',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -280,7 +280,7 @@ function GeoUser(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/follow/user/request',
+            url: 'http://192.168.0.17:3001/api/follow/user/request',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -347,7 +347,7 @@ function GeoUser(props) {
                                 mdUp  
                             >
                                 <Avatar 
-                                    src={`https://www.geocities.cc/api/get-photo/${geoUser.avatar}`} 
+                                    src={`http://192.168.0.17:3001/api/get-photo/${geoUser.avatar}`} 
                                     className={classes.profileAvatar} 
                                     title={`${geoUser.username}`} 
                                     alt={`${geoUser.username}`} 
@@ -358,7 +358,7 @@ function GeoUser(props) {
                                 smDown 
                             >
                                 <Avatar 
-                                    src={`https://www.geocities.cc/api/get-photo/${geoUser.avatar}`}
+                                    src={`http://192.168.0.17:3001/api/get-photo/${geoUser.avatar}`}
                                     title={`${geoUser.username}`}
                                     alt={`${geoUser.username}`}
                                     className={classes.profileAvatarLg} 
@@ -919,7 +919,7 @@ function GeoUser(props) {
                                                                     >
                                                                         <ListItemAvatar>
                                                                             <Avatar 
-                                                                                src={`https://www.geocities.cc/api/get-photo/${community.avatar}`}
+                                                                                src={`http://192.168.0.17:3001/api/get-photo/${community.avatar}`}
                                                                                 title={`${community.name} avatar`}
                                                                                 alt={`${community.name} avatar`}
                                                                             />
@@ -1395,7 +1395,7 @@ function GeoUser(props) {
                                                             >
                                                                 <ListItemAvatar>
                                                                     <Avatar 
-                                                                        src={`https://www.geocities.cc/api/get-photo/${community.avatar}`}
+                                                                        src={`http://192.168.0.17:3001/api/get-photo/${community.avatar}`}
                                                                         alt={`${community.name} avatar`}
                                                                         title={`${community.name} avatar`}
                                                                     />

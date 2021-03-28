@@ -107,7 +107,7 @@ function UserSettings(props) {
         else {
             return axios({
                 method: 'GET',
-                url: `https://www.geocities.cc/api/grab/user/${props.user.uniqueUserId}`,
+                url: `http://192.168.0.17:3001/api/grab/user/${props.user.uniqueUserId}`,
             }).then(response => {
                 //After the call, update the user and the theme color. 
                 props.dispatch({type: 'user/updateUser', payload: response.data.user});
@@ -182,7 +182,7 @@ function UserSettings(props) {
 
             return axios({
                 method: 'POST',
-                url: 'https://www.geocities.cc/api/change/username',
+                url: 'http://192.168.0.17:3001/api/change/username',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -238,7 +238,7 @@ function UserSettings(props) {
 
             return axios({
                 method: 'POST',
-                url: 'https://www.geocities.cc/api/change/password',
+                url: 'http://192.168.0.17:3001/api/change/password',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -285,7 +285,7 @@ function UserSettings(props) {
 
             return axios({
                 method: 'POST',
-                url: 'https://www.geocities.cc/api/change/email',
+                url: 'http://192.168.0.17:3001/api/change/email',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -314,7 +314,7 @@ function UserSettings(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/update/user/city',
+            url: 'http://192.168.0.17:3001/api/update/user/city',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -350,7 +350,7 @@ function UserSettings(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/update/user/state',
+            url: 'http://192.168.0.17:3001/api/update/user/state',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -386,7 +386,7 @@ function UserSettings(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/update/user/college',
+            url: 'http://192.168.0.17:3001/api/update/user/college',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -459,7 +459,7 @@ function UserSettings(props) {
 
             return axios({
                 method: 'POST',
-                url: 'https://www.geocities.cc/api/update/user/interests',
+                url: 'http://192.168.0.17:3001/api/update/user/interests',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -495,7 +495,7 @@ function UserSettings(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/update/user/twitter',
+            url: 'http://192.168.0.17:3001/api/update/user/twitter',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -531,7 +531,7 @@ function UserSettings(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/update/user/instagram',
+            url: 'http://192.168.0.17:3001/api/update/user/instagram',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -567,7 +567,7 @@ function UserSettings(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/update/user/youtube',
+            url: 'http://192.168.0.17:3001/api/update/user/youtube',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -603,7 +603,7 @@ function UserSettings(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/update/user/theme',
+            url: 'http://192.168.0.17:3001/api/update/user/theme',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -658,7 +658,7 @@ function UserSettings(props) {
     
             return axios({
                 method: 'POST',
-                url: 'https://www.geocities.cc/api/update/user/bio',
+                url: 'http://192.168.0.17:3001/api/update/user/bio',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -730,7 +730,7 @@ function UserSettings(props) {
 
             return axios({
                 method: 'POST',
-                url: 'https://www.geocities.cc/api/update/user/avatar',
+                url: 'http://192.168.0.17:3001/api/update/user/avatar',
                 data: fd,
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -775,7 +775,7 @@ function UserSettings(props) {
 
         return axios({
             method: 'post',
-            url: 'https://www.geocities.cc/api/update/user/privacy',
+            url: 'http://192.168.0.17:3001/api/update/user/privacy',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -809,7 +809,7 @@ function UserSettings(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/update/user/block',
+            url: 'http://192.168.0.17:3001/api/update/user/block',
             data: JSON.stringify(data),
             headers: {
                 'Content-Type': 'application/json',
@@ -851,7 +851,7 @@ function UserSettings(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/update/user/unblock',
+            url: 'http://192.168.0.17:3001/api/update/user/unblock',
             data: JSON.stringify(data),
             headers: {
                 'Content-Type': 'application/json',
@@ -1551,7 +1551,7 @@ function UserSettings(props) {
                             >
                                 <ListItemAvatar>
                                     <Avatar 
-                                        src={`https://www.geocities.cc/api/get-photo/${option.avatar}`}
+                                        src={`http://192.168.0.17:3001/api/get-photo/${option.avatar}`}
                                         alt={`${option.username}`}
                                         title={`${option.username}`} 
                                     />
@@ -1626,7 +1626,7 @@ function UserSettings(props) {
                                     >
                                         <ListItemAvatar>
                                             <Avatar 
-                                                src={`https://www.geocities.cc/api/get/avatar/by/id/${blockUser.uniqueUserId}`}
+                                                src={`http://192.168.0.17:3001/api/get/avatar/by/id/${blockUser.uniqueUserId}`}
                                                 alt={`${blockUser.username}`}
                                                 title={`${blockUser.username}`} 
                                             />

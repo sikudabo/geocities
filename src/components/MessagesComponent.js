@@ -20,11 +20,13 @@ import ListItemText from '@material-ui/core/ListItemText';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Avatar from '@material-ui/core/Avatar';
 import Autocomplete, { createFilterOptions } from '@material-ui/lab/Autocomplete';
+import Paper from '@material-ui/core/Paper';
+import * as _ from 'underscore';
 
 const userFilterOptions = createFilterOptions({
     matchFrom: 'any',
     stringify: option => option.firstName + ' ' + option.lastName + ' ' + option.username,
-}); //Filter options to search for users to potentially block. 
+}); //Filter options to search for users to message
 
 const useStyles = makeStyles(() => ({
     topGrid: {
@@ -33,6 +35,11 @@ const useStyles = makeStyles(() => ({
     topMarg: {
         marginTop: 20,
         textAlign: 'center',
+    },
+    paper: {
+        maxWidth: 600,
+        cursor: 'pointer',
+        margin: 'auto',
     },
 }));
 
@@ -60,12 +67,17 @@ function MessagesComponent(props) {
             //Grab threads and all GeoUsers.
             return axios({
                 method: 'GET',
-                url: `https://www.geocities.cc/api/get/threads/${props.user.uniqueUserId}`,
+                url: `http://192.168.0.17:3001/api/get/threads/${props.user.uniqueUserId}`,
             }).then(response => {
                 props.dispatch({type: 'user/updateUser', payload: response.data.user});
                 props.dispatch({type: 'ThemeChange', payload: response.data.user.profileTheme});
                 setUsers(response.data.users);
-                setThreads(response.data.threads);
+                //Create an if condition to only set thread if there are any for the user. 
+                if(response.data.threads) {
+                    //setThreads(response.data.threads);
+                    //setThreads(elements => [...elements, response.data.threads]);
+                    setThreads([...response.data.threads]);
+                }
             }).catch(err => {
                 console.log(err.message);
                 swal(
@@ -122,7 +134,7 @@ function MessagesComponent(props) {
 
             return axios({
                 method: 'POST',
-                url: 'https://www.geocities.cc/api/add/dm',
+                url: 'http://192.168.0.17:3001/api/add/dm',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -133,7 +145,9 @@ function MessagesComponent(props) {
                     'You successfully sent that message!',
                     'success',
                 );
-                setThreads(response.data.threads);
+                //setThreads(response.data.threads);
+                setThreads([...response.data.threads]);
+                console.log(response.data.threads);
                 setUsers(response.data.users);
                 setMsgTarget(null);
                 setMsg(null);
@@ -148,6 +162,51 @@ function MessagesComponent(props) {
                 );
                 setMsgSending(false);
             });
+        }
+    }
+
+    function findId(firstId, secondId) {
+        //This function will return the userId of the user who is not the "mainUser"
+        if(firstId === props.user.uniqueUserId) {
+            return secondId;
+        }
+        else {
+            return firstId;
+        }
+    }
+
+    function findUsername(firstUsername, secondUsername) {
+        //This function will return the username that does not match the mainUser username.
+        if(props.user.username === firstUsername) {
+            return secondUsername;
+        }
+        else {
+            return firstUsername;
+        }
+    }
+
+    function timeDifference(date2, dateString) {
+        //This function will return whether or not we display something like "2 hrs ago" "20 min ago" or the date string for a thread
+        let date1 = Date.now();
+        let difference = date1 - date2;
+        let daysDifference = Math.floor(difference/1000/60/60/24);
+        let hoursDifference = Math.floor(difference/1000/60/60);
+        let minutesDifference = Math.floor(difference/1000/60);
+        let secondsDifference = Math.floor(difference/1000);
+        if(daysDifference > 0) {
+            return dateString;
+        }
+        else if(hoursDifference > 0 && hoursDifference < 23) {
+            return `${hoursDifference} hr ago`;
+        }
+        else if(minutesDifference > 0 && minutesDifference < 60) {
+            return `${minutesDifference} min ago`;
+        }
+        else if(minutesDifference === 0) {
+            return `${secondsDifference} secs ago`
+        }
+        else {
+            return dateString;
         }
     }
 
@@ -166,7 +225,7 @@ function MessagesComponent(props) {
                         component='h4'
                         align='center' 
                     >
-                        {threads ? 'Messages' : 'No messages'}
+                        {threads.length > 0 ? 'Messages' : 'No messages'}
                     </Typography>
                 </Grid>
                 <Grid 
@@ -230,7 +289,7 @@ function MessagesComponent(props) {
                                         >
                                             <ListItemAvatar>
                                                 <Avatar 
-                                                    src={`https://www.geocities.cc/api/get-photo/${option.avatar}`}
+                                                    src={`http://192.168.0.17:3001/api/get-photo/${option.avatar}`}
                                                     alt={`${option.username}`}
                                                     title={`${option.username}`} 
                                                 />
@@ -308,6 +367,76 @@ function MessagesComponent(props) {
                             </Grid>
                         </DialogContent>
                     </Dialog>
+                </Grid>
+                {/* End of the Grid with the Button and Dialog inside. Now start Grid with messages threads */}
+                <Grid 
+                    style={{
+                        marginTop: 30,
+                        textAlign: 'center',
+                    }}
+                    item 
+                    xs={12} 
+                >
+                    {threads.length > 0 &&
+                        <div>
+                            {threads.map((thread, index) => (
+                                <Paper 
+                                    key={index.toString()}
+                                    elevation={3} 
+                                    style={{
+                                        marginBottom: index < threads.length - 1 ? 20 : 0,
+                                    }}
+                                    className={classes.paper}
+                                >
+                                    <ListItem 
+                                        alignItems='flex-start' 
+                                    >
+                                        <ListItemAvatar>
+                                            <Avatar 
+                                                src={`http://192.168.0.17:3001/api/get/avatar/by/id/${findId(thread.uniqueUserIds[0], thread.uniqueUserIds[1])}`}
+                                                alt='Geo User' 
+                                                title='User avatar' 
+                                            />
+                                        </ListItemAvatar>
+                                        <ListItemText 
+                                            primary={
+                                                <div>
+                                                    <Typography 
+                                                        variant='h6' 
+                                                        component='h6' 
+                                                    >
+                                                        {findUsername(thread.usernames[0], thread.usernames[1])}
+                                                    </Typography>
+                                                    <Typography 
+                                                        variant='subtitle2' 
+                                                        component='span' 
+                                                        color='textSecondary' 
+                                                    >
+                                                        {timeDifference(thread.messages[thread.messages.length - 1].utcTime, thread.messages[thread.messages.length - 1].dateString)}
+                                                    </Typography>
+                                                </div>
+                                            }
+                                            secondary={
+                                                <Grid 
+                                                    item 
+                                                    zeroMinWidth 
+                                                >
+                                                    <Typography 
+                                                        variant='body1' 
+                                                        component='p' 
+                                                        color='default'
+                                                        noWrap 
+                                                    >
+                                                        {thread.messages[thread.messages.length - 1].msg}
+                                                    </Typography>
+                                                </Grid>
+                                            }
+                                        />
+                                    </ListItem>
+                                </Paper>
+                            ))}
+                        </div>
+                    }
                 </Grid>
             </Grid>
         );

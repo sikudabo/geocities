@@ -12,8 +12,8 @@ const _ = require('underscore');
 const { mdiConsoleNetwork } = require('@mdi/js');
 const axios = require('axios');
 
-const dbUri = 'mongodb+srv://sikudabo:shooter1@cluster0.zkhru.mongodb.net/tester?retryWrites=true&w=majority';
-//const dbUri = 'mongodb://localhost:27017/geocities';
+//const dbUri = 'mongodb+srv://sikudabo:shooter1@cluster0.zkhru.mongodb.net/tester?retryWrites=true&w=majority';
+const dbUri = 'mongodb://localhost:27017/geocities';
 var conn = mongoose.createConnection(dbUri);
 
 conn.once('open', () => {
@@ -3095,14 +3095,14 @@ router.route('/api/get/threads/:uniqueUserId').get((req, res) => {
                         res.status(500).send('error');
                     }
                     else {
-                        let myThreads = _.find(threads, curThread => curThread.uniqueUserIds.includes(req.params.uniqueUserId));
+                        let myThreads = _.filter(threads, curThread => curThread.uniqueUserIds.includes(req.params.uniqueUserId));
+                        myThreads = _.sortBy(myThreads, thread => -thread.utcTime);
                         User.find({}, (err, users) => {
                             if(err) {
                                 console.log(err.message);
                                 res.status(500).send('error');
                             }
                             else {
-                                console.log(`The users are: ${users}`);
                                 res.status(200).json({user: user, users: users, threads: myThreads});
                             }
                         });
@@ -3148,15 +3148,25 @@ router.route('/api/add/dm').post((req, res) => {
                                 res.status(500).send('error');
                             }
                             else {
-                                let returnThreads = _.filter(threads, thread => thread.uniqueUserIds.includes(req.body.senderUniqueUserId));
-                                returnThreads = _.sortBy(returnThreads, thread => -thread.utcTime);
                                 User.find({}, (err, users) => {
                                     if(err) {
                                         console.log(err.message);
                                         res.status(500).send('error');
                                     }
                                     else {
-                                        res.status(200).json({users: users, threads: returnThreads});
+                                        //res.status(200).json({users: users, threads: returnThreads});
+                                        //Return the threads that have now been updated. 
+                                        Thread.find({}, (err, moreThreads) => {
+                                            if(err) {
+                                                console.log(err.message);
+                                                res.status(500).send('error');
+                                            }
+                                            else {
+                                                let returnThreads = _.filter(moreThreads, thread => thread.uniqueUserIds.includes(req.body.senderUniqueUserId));
+                                                returnThreads = _.sortBy(returnThreads, thread => -thread.utcTime);
+                                                res.status(200).json({users: users, threads: returnThreads});
+                                            }
+                                        });
                                     }
                                 });
                             }
@@ -3203,7 +3213,17 @@ router.route('/api/add/dm').post((req, res) => {
                                                 res.status(500).send('error');
                                             }
                                             else {
-                                                res.status(200).json({threads: returnThreads, users: users});
+                                                Thread.find({}, (err, moreThreads) => {
+                                                    if(err) {
+                                                        console.log(err.message);
+                                                        res.status(500).send('error');
+                                                    }
+                                                    else {
+                                                        let returnThreads = _.filter(moreThreads, thread => thread.uniqueUserIds.includes(req.body.senderUniqueUserId));
+                                                        returnThreads = _.sortBy(returnThreads, thread => -thread.utcTime);
+                                                        res.status(200).json({users: users, threads: returnThreads});
+                                                    }
+                                                });
                                             }
                                         });
                                     }

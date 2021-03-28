@@ -416,7 +416,7 @@ function Signup(props) {
             return axios({
                 method: 'POST',
                 data: fd,
-                url: 'https://www.geocities.cc/api/signup',
+                url: 'http://192.168.0.17:3001/api/signup',
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
