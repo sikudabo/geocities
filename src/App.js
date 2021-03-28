@@ -23,6 +23,7 @@ import Community from './components/Community'
 import CommunityChat from './components/CommunityChat';
 import UserSettings from './components/UserSettings';
 import MessagesComponent from './components/MessagesComponent.js';
+import ThreadComponent from './components/ThreadComponent';
 
 function App(props) {
   const theme = createMuiTheme({
@@ -118,6 +119,11 @@ function App(props) {
           <Route 
             component={MessagesComponent}
             path='/messages'
+            exact 
+          />
+          <Route 
+            component={ThreadComponent} 
+            path='/thread/:uniqueThreadId'
             exact 
           />
         </Switch>

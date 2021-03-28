@@ -387,6 +387,7 @@ function MessagesComponent(props) {
                                         marginBottom: index < threads.length - 1 ? 20 : 0,
                                     }}
                                     className={classes.paper}
+                                    onClick={e => history.push(`/thread/${thread.uniqueThreadId}`)}
                                 >
                                     <ListItem 
                                         alignItems='flex-start' 

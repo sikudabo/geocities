@@ -3246,27 +3246,25 @@ router.route('/api/add/dm').post((req, res) => {
                 uniqueMessageId: req.body.uniqueMessageId,
             };
 
-            Thread.updateOne({uniqueThreadId: req.body.targetThread}, {$push: {messages: newMsg}}, (err, result) => {
+            Thread.updateOne({uniqueThreadId: req.body.uniqueThreadId}, {$push: {messages: newMsg}}, (err, result) => {
                 if(err) {
                     console.log(err.message);
                     res.status(500).send('error');
                 }
                 else {
-                    Thread.find({}, (err, threads) => {
+                    Thread.findOne({uniqueThreadId: req.body.uniqueThreadId}, (err, thread) => {
                         if(err) {
                             console.log(err.message);
                             res.status(500).send('error');
                         }
                         else {
-                            let returnThreads = _.filter(threads, thread => thread.uniqueUserIds.includes(req.body.senderUniqueUserId));
-                            returnThreads = _.sortBy(returnThreads, thread => -thread.utcTime);
                             User.find({}, (err, users) => {
                                 if(err) {
                                     console.log(err.message);
                                     res.status(500).send('error');
                                 }
                                 else {
-                                    res.status(200).json({users: users, threads: returnThreads});
+                                    res.status(200).json({users: users, thread: thread});
                                 }
                             });
                         }
@@ -3274,6 +3272,64 @@ router.route('/api/add/dm').post((req, res) => {
                 }
             });
         }
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//---------------------------------------------------------------------------------
+//The route below will be responsible for grabbing an individual thread so that a user can send messages. 
+router.route('/api/grab/thread/:uniqueThreadId/:uniqueUserId').get((req, res) => {
+    try {
+        Thread.findOne({uniqueThreadId: req.params.uniqueThreadId}, (err, thread) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else if(!thread) {
+                console.log('Message thread not found');
+                res.status(200).send('no thread');
+            }
+            else {
+                User.findOne({uniqueUserId: req.params.uniqueUserId}, (err, user) => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        res.status(200).json({user: user, thread: thread});
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//---------------------------------------------------------------------------------
+//The route below will handle deleting a message from a DM thread.
+router.route('/api/delete/dm').post((req, res) => {
+    try {
+        Thread.updateOne({uniqueThreadId: req.body.uniqueThreadId}, {$pull: {messages: {uniqueMessageId: req.body.uniqueMessageId}}}, (err, result) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                Thread.findOne({uniqueThreadId: req.body.uniqueThreadId}, (err, thread) => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        res.status(200).json({thread: thread});
+                    }
+                });
+            }
+        });
     }
     catch(err) {
         console.log(err.message);
