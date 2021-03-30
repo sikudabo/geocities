@@ -24,6 +24,8 @@ import CommunityChat from './components/CommunityChat';
 import UserSettings from './components/UserSettings';
 import MessagesComponent from './components/MessagesComponent.js';
 import ThreadComponent from './components/ThreadComponent';
+import EventBuilder from './components/EventBuilder';
+import Events from './components/Events';
 
 function App(props) {
   const theme = createMuiTheme({
@@ -124,6 +126,16 @@ function App(props) {
           <Route 
             component={ThreadComponent} 
             path='/thread/:uniqueThreadId'
+            exact 
+          />
+          <Route 
+            component={EventBuilder} 
+            path='/build/event' 
+            exact 
+          />
+          <Route 
+            component={Events} 
+            path='/geocities/events'
             exact 
           />
         </Switch>

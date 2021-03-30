@@ -197,8 +197,16 @@ function TopBar(props) {
                                 Messages
                             </MenuItem>
                             <Divider />
-                            <MenuItem>
+                            <MenuItem 
+                                onClick={e => history.push('/build/event')} 
+                            >
                                 Create event
+                            </MenuItem>
+                            <Divider />
+                            <MenuItem 
+                                onClick={e => history.push('/geocities/events')} 
+                            >
+                                Events 
                             </MenuItem>
                             <Divider />
                             <MenuItem

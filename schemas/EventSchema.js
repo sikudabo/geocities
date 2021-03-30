@@ -20,12 +20,12 @@ const eventSchema = new mongoose.Schema({
             uniqueUserId: String,
         }),
     ],
+    timeString: String,
     utcTime: Number,
     utcTimeCreated: Number,
     uniqueEventId: String,
     city: String,
     state: String,
-    location: {},
 },
 {
     collection: 'events',

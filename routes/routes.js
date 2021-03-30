@@ -3338,4 +3338,222 @@ router.route('/api/delete/dm').post((req, res) => {
     }
 });
 //---------------------------------------------------------------------------------
+//The route below will handle adding an event to the database. 
+router.route('/api/create/event').post(uploads.single('img'), (req, res) => {
+    try {
+        let newEvent = new Event({
+            title: req.body.title,
+            description: req.body.description,
+            timeString: req.body.timeString,
+            dateString: req.body.dateString,
+            utcTime: req.body.utcTime,
+            utcTimeCreated: Date.now(),
+            topics: req.body.topics.split(','),
+            city: req.body.city,
+            state: req.body.eventState,
+            uniqueEventId: req.body.uniqueEventId,
+            username: req.body.username,
+            uniqueUserId: req.body.uniqueUserId,
+            src: req.file.filename,
+            likes: [],
+            attending: [{
+                uniqueUserId: req.body.uniqueUserId,
+                username: req.body.username,
+            }],
+        }).save(err => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                res.status(200).send('success');
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//---------------------------------------------------------------------------------
+//The route below will be responsible for fetching events from the GeoCities database!
+router.route('/api/fetch/events').get((req, res) => {
+    try {
+        Event.find({}, {}, {$sort: {utcTime: 1}}, (err, events) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                console.log(`Returning the events: ${events}`);
+                let newEvents = _.sortBy(events, event => -event.utcTime);
+                res.status(200).json({events: newEvents});
+            }
+        });
+    }
+    catch(e) {
+        console.log(e.message);
+        res.status(500).send('error');
+    }
+});
+//---------------------------------------------------------------------------------
+//The route below is responsible for unliking an event. 
+router.route('/api/unlike/event').post((req, res) => {
+    try {
+        Event.updateOne({uniqueEventId: req.body.uniqueEventId}, {$pull: {likes: {uniqueUserId: req.body.uniqueUserId}}}, (err, result) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                Event.find({}, (err, events) => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        let newEvents = _.sortBy(events, event => -event.utcTime);
+                        res.status(200).json({events: newEvents});
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//---------------------------------------------------------------------------------
+//The route below will handle liking an event 
+router.route('/api/like/event').post((req, res) => {
+    try {
+        let newLiker = {
+            uniqueUserId: req.body.uniqueUserId,
+            username: req.body.username,
+        };
+
+        Event.updateOne({uniqueEventId: req.body.uniqueEventId}, {$push: {likes: newLiker}}, (err, result) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                Event.find({}, (err, events) => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        let newEvents = _.sortBy(events, event => -event.utcTime);
+                        res.status(200).json({events: newEvents});
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//---------------------------------------------------------------------------------
+//The route below will enable a user to attend an event. 
+router.route('/api/attend/event').post((req, res) => {
+    try { 
+        let newAttender = {
+            uniqueUserId: req.body.uniqueUserId,
+            username: req.body.username,
+        };
+
+        Event.updateOne({uniqueEventId: req.body.uniqueEventId}, {$push: {attending: newAttender}}, (err, result) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                Event.find({}, (err, events) => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        let newEvents = _.sortBy(events, event => -event.utcTime);
+                        res.status(200).json({events: newEvents});
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//---------------------------------------------------------------------------------
+//The route below will allow a user to unattend an event if they don't want to go anymore. 
+router.route('/api/unattend/event').post((req, res) => {
+    try {
+        Event.updateOne({uniqueEventId: req.body.uniqueEventId}, {$pull: {attending: {uniqueUserId: req.body.uniqueUserId}}}, (err, result) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                Event.find({}, (err, events) => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        let newEvents = _.sortBy(events, event => -event.utcTime);
+                        res.status(200).json({events: newEvents});
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//---------------------------------------------------------------------------------
+//This route will handle deleting an event and the associated media image from the database. 
+router.route('/api/delete/event').post((req, res) => {
+    try {
+        gfs.remove({ filename: req.body.file, root: 'uploads' }, (err, gridStore) => {
+            if (err) {
+                console.log('Error deleting file from GridFs when user tried to delete a media post');
+                console.log(err);
+                res.status(500).send('error');
+            }
+            else {
+                Event.deleteOne({uniqueEventId: req.body.uniqueEventId}, (err, result) => {
+                    if(err) {
+                        console.log(err.message);
+                        res.status(500).send('error');
+                    }
+                    else {
+                        Event.find({}, (err, events) => {
+                            if(err) {
+                                console.log(err.message);
+                                res.status(500).send('error');
+                            }
+                            else {
+                                let newEvents = _.sortBy(events, event => -event.utcTime);
+                                res.status(200).json({events: events});
+                            }
+                        });
+                    }
+                });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//---------------------------------------------------------------------------------
 module.exports = router;
