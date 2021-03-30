@@ -105,6 +105,10 @@ function TopBar(props) {
                                 Log In
                             </Button>
                         </Link>
+                    </div>
+                }
+                {props.mainUser === null &&
+                    <div>
                         <Link 
                             className={classes.linkMarg} 
                             to='/signup' 
@@ -191,6 +195,10 @@ function TopBar(props) {
                                 onClick={e => history.push('/messages')}
                             >
                                 Messages
+                            </MenuItem>
+                            <Divider />
+                            <MenuItem>
+                                Create event
                             </MenuItem>
                             <Divider />
                             <MenuItem

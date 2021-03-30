@@ -3,6 +3,7 @@ const User = require('../models/UserModel'); //Import the user model for mongoos
 const Post = require('../models/PostModel');
 const Community = require('../models/CommunityModel');
 const Thread = require('../models/ThreadModel');
+const Event = require('../models/EventModel');
 const mongoose = require('mongoose');
 const multer = require('multer');
 const GridFsStorage = require('multer-gridfs-storage');
