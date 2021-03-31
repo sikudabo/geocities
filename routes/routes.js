@@ -13,8 +13,8 @@ const _ = require('underscore');
 const { mdiConsoleNetwork } = require('@mdi/js');
 const axios = require('axios');
 
-//const dbUri = 'mongodb+srv://sikudabo:shooter1@cluster0.zkhru.mongodb.net/tester?retryWrites=true&w=majority';
-const dbUri = 'mongodb://localhost:27017/geocities';
+const dbUri = 'mongodb+srv://sikudabo:shooter1@cluster0.zkhru.mongodb.net/tester?retryWrites=true&w=majority';
+//const dbUri = 'mongodb://localhost:27017/geocities';
 var conn = mongoose.createConnection(dbUri);
 
 conn.once('open', () => {
@@ -3547,6 +3547,45 @@ router.route('/api/delete/event').post((req, res) => {
                         });
                     }
                 });
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//---------------------------------------------------------------------------------
+//The route below will get a users' posts for the feed. 
+router.route('/api/get/user/feed/posts/:uniqueUserId').get((req, res) => {
+    try {
+        Post.find({}, {}, {sort: {utcTime: -1}}, (err, posts) => {
+            if(err) {
+                console.log(err.message);
+                res.status(500).send('error');
+            }
+            else {
+                console.log(`The posts are: ${posts}`);
+                res.status(200).json({posts: posts});
+            }
+        });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
+});
+//--------------------------------------------------------------------------------
+//The route below will get feed posts for a non user 
+router.route('/api/get/nonuser/feed/posts').get((req, res) => {
+    try {
+        Post.find({}, {}, {sort: {utcTime: -1}}, (err, posts) => {
+            if(err) {
+                console.log(err.messasge);
+                res.status(500).send('error');
+            }
+            else {
+                res.status(200).json({posts: posts});
             }
         });
     }

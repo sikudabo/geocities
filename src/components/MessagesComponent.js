@@ -67,7 +67,7 @@ function MessagesComponent(props) {
             //Grab threads and all GeoUsers.
             return axios({
                 method: 'GET',
-                url: `http://192.168.0.17:3001/api/get/threads/${props.user.uniqueUserId}`,
+                url: `https://www.geocities.cc/api/get/threads/${props.user.uniqueUserId}`,
             }).then(response => {
                 props.dispatch({type: 'user/updateUser', payload: response.data.user});
                 props.dispatch({type: 'ThemeChange', payload: response.data.user.profileTheme});
@@ -134,7 +134,7 @@ function MessagesComponent(props) {
 
             return axios({
                 method: 'POST',
-                url: 'http://192.168.0.17:3001/api/add/dm',
+                url: 'https://www.geocities.cc/api/add/dm',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -289,7 +289,7 @@ function MessagesComponent(props) {
                                         >
                                             <ListItemAvatar>
                                                 <Avatar 
-                                                    src={`http://192.168.0.17:3001/api/get-photo/${option.avatar}`}
+                                                    src={`https://www.geocities.cc/api/get-photo/${option.avatar}`}
                                                     alt={`${option.username}`}
                                                     title={`${option.username}`} 
                                                 />
@@ -394,7 +394,7 @@ function MessagesComponent(props) {
                                     >
                                         <ListItemAvatar>
                                             <Avatar 
-                                                src={`http://192.168.0.17:3001/api/get/avatar/by/id/${findId(thread.uniqueUserIds[0], thread.uniqueUserIds[1])}`}
+                                                src={`https://www.geocities.cc/api/get/avatar/by/id/${findId(thread.uniqueUserIds[0], thread.uniqueUserIds[1])}`}
                                                 alt='Geo User' 
                                                 title='User avatar' 
                                             />

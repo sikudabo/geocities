@@ -55,7 +55,7 @@ function ThreadComponent(props) {
         else {
             return axios({
                 method: 'GET',
-                url: `http://192.168.0.17:3001/api/grab/thread/${params.uniqueThreadId}/${props.user.uniqueUserId}`,
+                url: `https://www.geocities.cc/api/grab/thread/${params.uniqueThreadId}/${props.user.uniqueUserId}`,
             }).then(response => {
                 if(response.data === 'no thread') {
                     swal(
@@ -160,7 +160,7 @@ function ThreadComponent(props) {
 
             return axios({
                 method:'POST',
-                url: 'http://192.168.0.17:3001/api/add/dm',
+                url: 'https://www.geocities.cc/api/add/dm',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -203,7 +203,7 @@ function ThreadComponent(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.17:3001/api/delete/dm',
+            url: 'https://www.geocities.cc/api/delete/dm',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -259,7 +259,7 @@ function ThreadComponent(props) {
                                     >
                                         <ListItemAvatar>
                                             <Avatar 
-                                                src={`http://192.168.0.17:3001/api/get/avatar/by/id/${message.senderUniqueUserId}`}
+                                                src={`https://www.geocities.cc/api/get/avatar/by/id/${message.senderUniqueUserId}`}
                                                 alt={`${message.senderUsername}`}
                                                 title={`${message.senderUsername}`} 
                                                 onClick={e => history.push(`/geouser/${message.senderUniqueUserId}`)} 

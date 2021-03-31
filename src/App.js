@@ -26,6 +26,9 @@ import MessagesComponent from './components/MessagesComponent.js';
 import ThreadComponent from './components/ThreadComponent';
 import EventBuilder from './components/EventBuilder';
 import Events from './components/Events';
+import Feed from './components/Feed';
+import MusicComponent from './components/MusicComponent';
+import SongComponent from './components/SongComponent';
 
 function App(props) {
   const theme = createMuiTheme({
@@ -136,6 +139,21 @@ function App(props) {
           <Route 
             component={Events} 
             path='/geocities/events'
+            exact 
+          />
+          <Route 
+            component={Feed} 
+            path='/geocities/feed' 
+            exact 
+          />
+          <Route 
+            component={MusicComponent} 
+            path='/geocities/music'
+            exact 
+          />
+          <Route 
+            component={SongComponent} 
+            path='/geocities/song/:song'
             exact 
           />
         </Switch>

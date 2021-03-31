@@ -129,7 +129,7 @@ function GeoUserPostsCard(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.17:3001/api/handle/geo/post/like',
+            url: 'https://www.geocities.cc/api/handle/geo/post/like',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -176,7 +176,7 @@ function GeoUserPostsCard(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.17:3001/api/delete/post',
+            url: 'https://www.geocities.cc/api/delete/post',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -226,7 +226,7 @@ function GeoUserPostsCard(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.17:3001/api/delete/media/post',
+            url: 'https://www.geocities.cc/api/delete/media/post',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -295,7 +295,7 @@ function GeoUserPostsCard(props) {
 
             return axios({
                 method: 'POST',
-                url: 'http://192.168.0.17:3001/api/add/geo/comment',
+                url: 'https://www.geocities.cc/api/add/geo/comment',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -334,7 +334,7 @@ function GeoUserPostsCard(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.17:3001/api/delete/comment',
+            url: 'https://www.geocities.cc/api/delete/comment',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -389,7 +389,7 @@ function GeoUserPostsCard(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.17:3001/api/handle/geo/comment/like',
+            url: 'https://www.geocities.cc/api/handle/geo/comment/like',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -475,7 +475,7 @@ function GeoUserPostsCard(props) {
                 }
                 avatar={
                     <Avatar 
-                        src={`http://192.168.0.17:3001/api/get/avatar/by/community/name/${props.post.community}`}
+                        src={`https://www.geocities.cc/api/get/avatar/by/community/name/${props.post.community}`}
                         title={`${props.post.username}`}
                         alt={`${props.post.username}`}
                     />
@@ -513,7 +513,7 @@ function GeoUserPostsCard(props) {
                 {props.post.type === 'photo' &&
                     <CardMedia 
                         className={classes.media}
-                        image={`http://192.168.0.17:3001/api/get-photo/${props.post.src}`}
+                        image={`https://www.geocities.cc/api/get-photo/${props.post.src}`}
                         title={`Post by ${props.post.username}`}
                         alt='GeoCities photo post'
                     />
@@ -536,7 +536,7 @@ function GeoUserPostsCard(props) {
                             type='video'
                             sources={[
                                 {
-                                    src: `http://192.168.0.17:3001/api/get-video/${props.post.src}`,
+                                    src: `https://www.geocities.cc/api/get-video/${props.post.src}`,
                                 }
                             ]}
                             fullscreen={{
@@ -737,7 +737,7 @@ function GeoUserPostsCard(props) {
                                         >
                                             <ListItemAvatar>
                                                 <Avatar 
-                                                    src={`http://192.168.0.17:3001/api/get/avatar/by/id/${comment.uniqueUserId}`}
+                                                    src={`https://www.geocities.cc/api/get/avatar/by/id/${comment.uniqueUserId}`}
                                                     title={`${comment.username}`}
                                                     alt={`${comment.username}`} 
                                                     onClick={e => handleUserPush(comment.uniqueUserId)}

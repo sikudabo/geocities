@@ -59,7 +59,7 @@ export default function CardExample() {
     function playMusic() {
         alterCount();
         if(counter === 1) {
-            scAudio.resolve('https://api.soundcloud.com/tracks/306743131/', function(track) {
+            scAudio.resolve('https://api.soundcloud.com/tracks/306743131/stream', function(track) {
                 scAudio.play();
                 setPaused(false);
             });

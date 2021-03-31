@@ -28,7 +28,7 @@ function Events(props) {
         if(true) {
             return axios({
                 method: 'GET',
-                url: 'http://192.168.0.17:3001/api/fetch/events',
+                url: 'https://www.geocities.cc/api/fetch/events',
             }).then(response => {
                 setEvents([...response.data.events]);
             }).catch(err => {

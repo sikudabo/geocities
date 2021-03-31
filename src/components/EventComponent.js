@@ -68,7 +68,7 @@ function EventComponent(props) {
     
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.17:3001/api/unlike/event',
+            url: 'https://www.geocities.cc/api/unlike/event',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -104,7 +104,7 @@ function EventComponent(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.17:3001/api/like/event',
+            url: 'https://www.geocities.cc/api/like/event',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -140,7 +140,7 @@ function EventComponent(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.17:3001/api/attend/event',
+            url: 'https://www.geocities.cc/api/attend/event',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -175,7 +175,7 @@ function EventComponent(props) {
 
         return axios({
             method: 'POST',
-            url:'http://192.168.0.17:3001/api/unattend/event',
+            url:'https://www.geocities.cc/api/unattend/event',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -210,7 +210,7 @@ function EventComponent(props) {
 
         return axios({
             method: 'POST',
-            url: 'http://192.168.0.17:3001/api/delete/event',
+            url: 'https://www.geocities.cc/api/delete/event',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -253,7 +253,7 @@ function EventComponent(props) {
                 }
                 avatar={
                     <Avatar 
-                        src={`http://192.168.0.17:3001/api/get/avatar/by/id/${props.event.uniqueUserId}`}
+                        src={`https://www.geocities.cc/api/get/avatar/by/id/${props.event.uniqueUserId}`}
                         alt={`${props.event.username}`}
                         title={`${props.event.username}`} 
                         style={{
@@ -267,7 +267,7 @@ function EventComponent(props) {
                 {true &&
                     <CardMedia 
                         component='img'
-                        src={`http://192.168.0.17:3001/api/get-photo/${props.event.src}`}
+                        src={`https://www.geocities.cc/api/get-photo/${props.event.src}`}
                         title={`Post by ${props.event.username}`}
                         alt='GeoCities'
                     />
@@ -378,7 +378,7 @@ function EventComponent(props) {
                         >
                             <ListItemAvatar>
                                 <Avatar 
-                                    src={`http://192.168.0.17:3001/api/get/avatar/by/id/${attender.uniqueUserId}`}
+                                    src={`https://www.geocities.cc/api/get/avatar/by/id/${attender.uniqueUserId}`}
                                     title={`${attender.username}`}
                                     alt={`${attender.username}`} 
                                     style={{
