@@ -61,9 +61,9 @@ app.get('*', (req, res) => {
 });
 
 //The code below will prevent the process from exiting and freezing the app on an error.
-/*process.on('uncaughtException', err => {
+process.on('uncaughtException', err => {
     console.log(`Uncaught Exception: ${err.message}`)
-});*/
+});
 
 const server = http.createServer(app).listen(app.get('port'), () => {
     console.log(`Listening on port ${app.get('port')}`);
