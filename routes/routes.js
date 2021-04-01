@@ -169,6 +169,9 @@ router.route('/api/signup').post(uploads.single('avatar'), (req, res) => {
 router.route('/api/grab/user/:uniqueUserId').get((req, res) => {
     console.log(`The uniqueUserId is: ${req.params.uniqueUserId}`);
         let uniqueUserId = req.params.uniqueUserId; //get the userId from params. 
+        if(!uniqueUserId) {
+            uniqueUserId = 1;
+        }
         User.findOne({uniqueUserId: uniqueUserId}, (err, user) => {
             if(err) {
                 console.log('There was an error grabbing a user from the databse at line 163');
