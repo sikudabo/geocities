@@ -37,6 +37,7 @@
     "nodemailer": "^6.4.16",
     "nodemon": "^2.0.6",
     "postcss": "^8.4.19",
+    "postcss-flexbugs-fixes": "^5.0.2",
     "react": "^17.0.1",
     "react-color": "^2.19.3",
     "react-dom": "^17.0.1",
@@ -77,7 +78,7 @@
     "workbox-streams": "^5.1.4"
   },
   "scripts": {
-    "start": "react-scripts start",
+    "start": "nodemon server.js",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
