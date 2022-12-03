@@ -3,16 +3,23 @@ const multer = require('multer');
 const GridFsStorage = require('multer-gridfs-storage');
 const Grid = require('gridfs-stream');
 const path = require('path');
+const dotenv = require('dotenv').config();
 
-const dbUri = 'mongodb://localhost:27017/excitedb';
+const dbUri = process.env.DB;
+console.log(dbUri);
+let gfs;
 
 var conn = mongoose.createConnection(dbUri);
 
-conn.once('open', () => {
-    // Init Stream
-    gfs = Grid(conn.db, mongoose.mongo);
-    gfs.collection('uploads');
-});
+async function getGfs() {
+  let myReturn = await conn.once('open', () => {
+                    // Init Stream
+                    gfs = Grid(conn.db, mongoose.mongo);
+                    gfs.collection('uploads');
+                    return 'done';
+                  });
+  return myReturn;
+}
 
 const storage = new GridFsStorage({
     url: dbUri,
@@ -28,9 +35,6 @@ const storage = new GridFsStorage({
     }
 });
 
-const uploads = multer({ storage });
-
-module.exports = {
-  uploads: uploads,
-  gfs: this.gfs,
-}
+getGfs().then(result => {
+  module.exports = gfs;
+});

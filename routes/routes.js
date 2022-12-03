@@ -1,3 +1,5 @@
+const path = require('path');
+const dotenv = require('dotenv').config();
 const router = require('express').Router();
 const User = require('../models/UserModel'); //Import the user model for mongoose connectivity.
 const Post = require('../models/PostModel');
@@ -8,19 +10,20 @@ const mongoose = require('mongoose');
 const multer = require('multer');
 const GridFsStorage = require('multer-gridfs-storage');
 const Grid = require('gridfs-stream');
-const path = require('path');
 const _ = require('underscore');
 const { mdiConsoleNetwork } = require('@mdi/js');
 const axios = require('axios');
 
-const dbUri = 'mongodb+srv://sikudabo:shooter1@cluster0.zkhru.mongodb.net/tester?retryWrites=true&w=majority';
-//const dbUri = 'mongodb://localhost:27017/geocities';
-var conn = mongoose.createConnection(dbUri);
+const dbUri = process.env.DB;
+
+var conn = mongoose.createConnection(process.env.DB, {useNewUrlParser: true, useUnifiedTopology: true});
+mongoose.connect(process.env.DB, {useNewUrlParser: true, useUnifiedTopology: true});
 
 conn.once('open', () => {
     // Init Stream
     gfs = Grid(conn.db, mongoose.mongo);
     gfs.collection('uploads');
+    return 'done';
 });
 
 const storage = new GridFsStorage({
@@ -46,6 +49,12 @@ router.route('/api/login').post((req, res) => {
     //First, get the username and password from the body of the request object from the post request.
     let username = req.body.username;
     let password = req.body.password;
+    console.log('Someone is trying to login');
+
+    if(!req.body.username) {
+        //Condition to handle if no username is found in the request. 
+        res.status(200).send('user not found');
+    }
 
     //Wrap everything in a try/catch block 
     try {
@@ -167,7 +176,8 @@ router.route('/api/signup').post(uploads.single('avatar'), (req, res) => {
 
 //The route below will handle grabbing a user within a get request from the database. 
 router.route('/api/grab/user/:uniqueUserId').get((req, res) => {
-    console.log(`The uniqueUserId is: ${req.params.uniqueUserId}`);
+    try {
+        console.log(`The uniqueUserId is: ${req.params.uniqueUserId}`);
         let uniqueUserId = req.params.uniqueUserId; //get the userId from params. 
         if(!uniqueUserId) {
             uniqueUserId = 1;
@@ -210,7 +220,16 @@ router.route('/api/grab/user/:uniqueUserId').get((req, res) => {
                                         res.status(500).send('error');
                                     }
                                     else {
-                                        res.status(200).json({user: user, posts: posts, communities: communities, users: users});
+                                        //Now grab the events associated with this user 
+                                        Event.find({uniqueUserId: req.params.uniqueUserId}, (err, events) => {
+                                            if(err) {
+                                                console.log(err.message);
+                                                res.status(500).send('error');
+                                            }
+                                            else {
+                                                res.status(200).json({user: user, posts: posts, communities: communities, users: users, events: events});
+                                            }
+                                        });
                                     }
                                 });
                             }
@@ -219,11 +238,17 @@ router.route('/api/grab/user/:uniqueUserId').get((req, res) => {
                 });
             }
         });
+    }
+    catch(err) {
+        console.log(err.message);
+        res.status(500).send('error');
+    }
 });
 //------------------------------------------------------------------------------------------------------
 
 //Route to serve photos in a get request based on the file name.
 router.route('/api/get-photo/:photo').get((req, res) => {
+    
     let photo = req.params.photo;
     gfs.files.findOne({ filename: photo }, (err, file) => {
         // Check if file
@@ -250,6 +275,7 @@ router.route('/api/get/avatar/by/community/name/:name').get((req, res) => {
                 res.status(500).send('error');
             }
             else {
+                
                 let photo = community.avatar;
                 gfs.files.findOne({ filename: photo }, (err, file) => {
                     // Check if file
@@ -278,6 +304,7 @@ router.route('/api/get/avatar/by/community/name/:name').get((req, res) => {
 //The route below will handle getting a video file from the database and streaming it to the server. 
 router.route('/api/get-video/:video').get((req, res) => {
     let video = req.params.video;
+    
     gfs.files.findOne({ filename: video }, (err, file) => {
         // Check if file
         if (!file || file.length === 0) {
@@ -338,6 +365,7 @@ router.route('/api/get/avatar/by/id/:uniqueuserid').get((req, res) => {
                 res.status(404).send('User avatar not found');
             }
             else {
+                
                 let avatar = user.avatar;
                 gfs.files.findOne({ filename: avatar }, (err, file) => {
                     // Check if file
@@ -439,7 +467,7 @@ router.route('/api/add/comment').post((req, res) => {
                         msg: `${req.body.username} commented on your post.`,
                         type: 'comment',
                         uniqueSenderId: req.body.uniqueUserId,
-                        link: `http://192.168.0.9:3000/profile#${req.body.uniquePostId}`,
+                        link: `${process.env.DEV_NETWORK_ADDRESS}profile#${req.body.uniquePostId}`,
                         uniqueNotificationId: Date.now() + 'this' + req.body.uniquePostId,
                     };
 
@@ -646,7 +674,7 @@ router.route('/api/handle/post/like').post((req, res) => {
                             msg: `${req.body.username} liked your post.`,
                             type: 'like',
                             uniqueSenderId: req.body.uniqueLikerId,
-                            link: `http://192.168.0.9:3000/profile#${req.body.uniquePostId}`,
+                            link: `${process.env.DEV_FE_ADDRESS}profile#${req.body.uniquePostId}`,
                             uniqueNotificationId: Date.now() + 'like' + req.body.uniquePostId + Date.now(),
                         };
 
@@ -972,7 +1000,7 @@ router.route('/api/handle/geo/comment/like').post((req, res) => {
                                             type: 'comment like',
                                             uniqueNotificationId: Date.now() + 'commentlike' + req.body.uniqueCommenterId,
                                             uniqueSenderId: req.body.uniqueLikerId,
-                                            link: req.body.postType === 'personal' ? `/profile#${req.body.uniquePostId}` : 'http://192.168.0.9/communityposts',
+                                            link: req.body.postType === 'personal' ? `/profile#${req.body.uniquePostId}` : `${process.env.DEV_NETWORK_ADDRESS}communityposts`,
                                         };
 
                                         User.updateOne({uniqueUserId: req.body.uniqueCommenterId}, {$push: {notifications: newNotification}}, (err, result) => {
@@ -1001,7 +1029,7 @@ router.route('/api/handle/geo/comment/like').post((req, res) => {
                                                     });
                                                 }
                                                 else {
-                                                    Post.find({uniqueUserId: req.body.uniquePostPosterId}, {}, {sort: {utcTime: -1}}, (err, posts) => {
+                                                    Post.find({uniqueUserId: req.body.uniquePostPosterId, context: 'personal'}, {}, {sort: {utcTime: -1}}, (err, posts) => {
                                                         if(err) {
                                                             console.log(err.message);
                                                             res.status(500).send('error');
@@ -1176,7 +1204,7 @@ router.route('/api/handle/comment/like').post((req, res) => {
                                             type: 'comment like',
                                             uniqueNotificationId: req.body.uniqueLikerId + Date.now() + req.body.uniqueCommenterId,
                                             uniqueSenderId: req.body.uniqueLikerId,
-                                            link: req.body.postType === 'personal' ? `/profile#${req.body.uniquePostId}` : `http://192.168.0.9:3000/community`,
+                                            link: req.body.postType === 'personal' ? `/profile#${req.body.uniquePostId}` : `${process.env.DEV_FE_ADDRESS}/community`,
                                         };
 
                                         User.updateOne({uniqueUserId: req.body.uniqueCommenterId}, {$push: {notifications: newNotification}}, (err, result) => {
@@ -1352,6 +1380,7 @@ router.route('/api/delete/media/post').post((req, res) => {
                 res.status(500).send('error');
             }
             else {
+                
                 gfs.remove({ filename: req.body.filename, root: 'uploads' }, (err, gridStore) => {
                     if (err) {
                         console.log('Error deleting file from GridFs when user tried to delete a media post');
@@ -1502,7 +1531,16 @@ router.route('/api/get/geo/user/:geoUserId/:mainUserId').get((req, res) => {
                                         res.status(500).send('error');
                                     }
                                     else {
-                                        res.status(200).json({mainUser: mainUser, geoUser: geoUser, posts: posts, communities: communities});
+                                        //Now, we need to grab user created events. 
+                                        Event.find({uniqueUserId: req.params.geoUserId}, (err, events) => {
+                                            if(err) {
+                                                console.log(err.message);
+                                                res.status(500).send('error');
+                                            }
+                                            else {
+                                                res.status(200).json({mainUser: mainUser, geoUser: geoUser, posts: posts, communities: communities, events: events});
+                                            }
+                                        });
                                     }
                                 });
                             }
@@ -1546,8 +1584,15 @@ router.route('/api/get/public/geo/user/:uniqueUserId').get((req, res) => {
                                 res.status(200).json({geoUser: user, posts: posts, communities: []});
                             }
                             else {
-                                console.log(`The communities are ${communities}`);
-                                res.status(200).json({geoUser: user, posts: posts, communities: communities});
+                                Event.find({uniqueUserId: req.params.uniqueUserId}, (err, events) => {
+                                    if(err) {
+                                        console.log(err.message);
+                                    }
+                                    else {
+                                        console.log(`The communities are ${communities}`);
+                                        res.status(200).json({geoUser: user, posts: posts, communities: communities, events: events});
+                                    }
+                                });
                             }
                         });
                     }
@@ -2370,6 +2415,7 @@ router.route('/api/update/community/avatar').post(uploads.single('avatar'), (req
                 res.status(500).send('error');
             }
             else {
+                
                 gfs.remove({ filename: req.body.filename, root: 'uploads' }, (err, gridStore) => {
                     if (err) {
                         console.log('Error deleting file from GridFs when user tried to delete a media post');
@@ -2897,6 +2943,7 @@ router.route('/api/update/user/bio').post((req, res) => {
 //The route below will handle deleting a users' avatar.
 router.route('/api/update/user/avatar').post(uploads.single('avatar'), (req, res) => {
     try {
+        
         gfs.remove({ filename: req.body.oldAvatar, root: 'uploads' }, (err, gridStore) => {
             if (err) {
                 console.log('Error deleting file from GridFs when user tried to delete a media post');
@@ -3250,7 +3297,7 @@ router.route('/api/add/dm').post((req, res) => {
                 uniqueMessageId: req.body.uniqueMessageId,
             };
 
-            Thread.updateOne({uniqueThreadId: req.body.uniqueThreadId}, {$push: {messages: newMsg}}, (err, result) => {
+            Thread.updateOne({uniqueThreadId: req.body.uniqueThreadId}, {$push: {messages: newMsg}, utcTime: Date.now()}, (err, result) => {
                 if(err) {
                     console.log(err.message);
                     res.status(500).send('error');
@@ -3525,6 +3572,7 @@ router.route('/api/unattend/event').post((req, res) => {
 //This route will handle deleting an event and the associated media image from the database. 
 router.route('/api/delete/event').post((req, res) => {
     try {
+        
         gfs.remove({ filename: req.body.file, root: 'uploads' }, (err, gridStore) => {
             if (err) {
                 console.log('Error deleting file from GridFs when user tried to delete a media post');
@@ -3569,11 +3617,13 @@ router.route('/api/get/user/feed/posts/:uniqueUserId').get((req, res) => {
             }
             else {
                 console.log(`The posts are: ${posts}`);
+                console.log('Posts sending!');
                 res.status(200).json({posts: posts});
             }
         });
     }
     catch(err) {
+        console.log('Error sending posts!');
         console.log(err.message);
         res.status(500).send('error');
     }
@@ -3585,14 +3635,17 @@ router.route('/api/get/nonuser/feed/posts').get((req, res) => {
         Post.find({}, {}, {sort: {utcTime: -1}}, (err, posts) => {
             if(err) {
                 console.log(err.messasge);
+                console.log('Error sending feed posts to non-user');
                 res.status(500).send('error');
             }
             else {
+                console.log('We are sending posts for a non-user!');
                 res.status(200).json({posts: posts});
             }
         });
     }
     catch(err) {
+        console.log('Error sending posts for a non-user!');
         console.log(err.message);
         res.status(500).send('error');
     }

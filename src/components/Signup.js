@@ -382,15 +382,15 @@ function Signup(props) {
             setOpen(false);
             return false;
         }
-        else if(firstName + ' ' + lastName !== facebookName) {
-            swal(
+        /* else if(firstName + ' ' + lastName !== facebookName) {
+             swal(
                 'Uh Oh!',
                 `Your first and last name must match your Facebook first and last name!: ${firstName} ${lastName} ${facebookName}`,
                 'error',
             );
             setOpen(false);
-            return false;
-        }
+             return false; 
+        } */
         else {
             let fd = new FormData();
             fd.append('username', username);

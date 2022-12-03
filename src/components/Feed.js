@@ -139,7 +139,7 @@ function Feed(props) {
                                                     style={{
                                                         cursor: 'pointer',
                                                     }}
-                                                    onClick={e => post.context === 'personal' ? history.push(`geouser/${post.uniqueUserId}`) : history.push(`/community/${post.community}`)}
+                                                    onClick={e => post.context === 'personal' ? history.push(`/geouser/${post.uniqueUserId}`) : history.push(`/community/${post.community}`)}
                                                 >
                                                     {post.context === 'personal' ? post.username : post.community}
                                                 </Typography>
@@ -193,8 +193,8 @@ function Feed(props) {
                                         <div>
                                             {post.type === 'photo' &&
                                                 <CardMedia 
-                                                    className={classes.media}
-                                                    image={`https://www.geocities.cc/api/get-photo/${post.src}`}
+                                                    component='img'
+                                                    src={`https://www.geocities.cc/api/get-photo/${post.src}`}
                                                     title={`Post by ${post.username}`}
                                                     alt='GeoCities photo post'
                                                 />

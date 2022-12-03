@@ -18,6 +18,10 @@ import Alive from '../site-images/Alive.jpeg';
 import Where from '../site-images/Where.jpeg';
 import MotionCity from '../site-images/MotionCity.jpeg';
 import RiotRock from '../site-images/RiotRock.jpeg';
+import Ghetto from '../site-images/ghetto.jpeg';
+import WeWereSharksCover from '../site-images/we_were_sharks_cover.jpeg';
+import JurassicPark from '../site-images/jurassic_park.jpg';
+import HateMe from '../site-images/hate_me.jpeg';
 import { useParams, useHistory } from 'react-router-dom';
 import swal from 'sweetalert';
 import Backdrop from '@material-ui/core/Backdrop';
@@ -73,6 +77,42 @@ const songs = [
         cover: RiotRock,
         id: 'https://api.soundcloud.com/tracks/769382284/stream'
     },
+    {
+        song: 'Abandoned',
+        artist: 'Rod Wave',
+        cover: Ghetto,
+        id: 'https://api.soundcloud.com/tracks/705998914/stream',
+    },
+    {
+        song: 'Poison',
+        artist: 'Rod Wave',
+        cover: Ghetto,
+        id: 'https://api.soundcloud.com/tracks/705999661/stream',
+    },
+    {
+        song: 'Counted Steps',
+        artist: 'Rod Wave',
+        cover: Ghetto,
+        id: 'https://api.soundcloud.com/tracks/705999334/stream',
+    },
+    {
+        song: 'Shameless',
+        artist: 'We Were Sharks',
+        cover: WeWereSharksCover,
+        id: 'https://api.soundcloud.com/tracks/886558297/stream',
+    },
+    {
+        song: 'Jurassic Park',
+        artist: 'Stand Atlantic',
+        cover: JurassicPark,
+        id: 'https://api.soundcloud.com/tracks/774548719/stream',
+    },
+    {
+        song: 'Hate me (sometimes)',
+        artist: 'Stand Atlantic',
+        cover: HateMe,
+        id: 'https://api.soundcloud.com/tracks/679144611/stream',
+    },
 ];
 
 const useStyles = makeStyles((theme) => ({
@@ -115,7 +155,7 @@ function SongComponent(props) {
     const scAudio = new SoundCloudAudio('aba2c7918a43ab0cc467124cfc00a9c7');
     const [playing, setPlaying] = useState(false);
     const [count, setCount] = useState(0);
-    let arr = [0, 1, 2, 3, 4, 5, 6];
+    let arr = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13];
 
     useEffect(() => {
         if(props.user !== null) {

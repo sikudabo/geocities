@@ -263,6 +263,9 @@ function ThreadComponent(props) {
                                                 alt={`${message.senderUsername}`}
                                                 title={`${message.senderUsername}`} 
                                                 onClick={e => history.push(`/geouser/${message.senderUniqueUserId}`)} 
+                                                style={{
+                                                    cursor: 'pointer',
+                                                }}
                                             />
                                         </ListItemAvatar>
                                         <ListItemText 

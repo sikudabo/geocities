@@ -31,6 +31,7 @@ import Backdrop from '@material-ui/core/Backdrop';
 import CircularProgress from '@material-ui/core/CircularProgress';
 import GeoUserPostsCard from './GeoUserPostsCard';
 import NonUserPostsCard from './NonUserPostsCard';
+import UserEventsCard from './UserEventsCard';
 
 function TabPanel(props) {
     //This component will serve as the panel for each individual tab.
@@ -116,6 +117,7 @@ function GeoUser(props) {
     const [curTab, setCurTab] = useState(0); //The tab that should display. 
     const [isFollowingRequest, setIsFollowingRequest] = useState(false); //Variable and setter that will disable follow button if the user sends a request on a private profile. 
     const [communities, setCommunities] = useState([]); //Variable and setter for the users' list of communites
+    const [events, setEvents] = useState([]);
     
     useEffect(() => {
         if(props.mainUser === null) {
@@ -130,6 +132,7 @@ function GeoUser(props) {
                     props.dispatch({type: 'ThemeChange', payload: response.data.geoUser.profileTheme});
                     setGeoUser(response.data.geoUser); //Set the local geoUser state variable.
                     setCommunities(response.data.communities);
+                    setEvents(response.data.events);
                 }
                 else {
                     swal(
@@ -174,6 +177,7 @@ function GeoUser(props) {
                             props.dispatch({type: 'visitorPosts/updatePosts', payload: response.data.posts});
                             setGeoUser(response.data.geoUser);
                             setCommunities(response.data.communities);
+                            setEvents(response.data.events);
                         }
                     }
                 }
@@ -1051,7 +1055,31 @@ function GeoUser(props) {
                                             index={2} 
                                             value={curTab} 
                                         >
-                                            Events 
+                                            {(events !== null && events.length < 1) &&
+                                                <Typography 
+                                                    component='h6'
+                                                    variant='h6' 
+                                                    align='center' 
+                                                >
+                                                    No events
+                                                </Typography>
+                                            }
+                                            {(events !== null && events.length > 0) &&
+                                                <div>
+                                                    {events.map((event, index) => (
+                                                        <UserEventsCard 
+                                                            key={index.toString()}
+                                                            username={event.username}
+                                                            dateString={event.dateString}
+                                                            uniqueUserId={event.uniqueUserId}
+                                                            src={event.src}
+                                                            title={event.title}
+                                                            description={event.description}
+                                                            uniqueEventId={event.uniqueEventId} 
+                                                        />
+                                                    ))}
+                                                </div>
+                                            }
                                         </TabPanel>
                                     </Grid>
                                 </div>
@@ -1529,7 +1557,31 @@ function GeoUser(props) {
                                     index={2} 
                                     value={curTab} 
                                 >
-                                    Events 
+                                    {(events !== null && events.length < 1) &&
+                                        <Typography 
+                                            variant='h6'
+                                            component='h6'
+                                            align='center' 
+                                        >
+                                            No events 
+                                        </Typography>
+                                    }
+                                    {(events !== null && events.length > 0) &&
+                                        <div>
+                                            {events.map((event, index) => (
+                                                <UserEventsCard 
+                                                    key={index.toString()}
+                                                    username={event.username}
+                                                    dateString={event.dateString}
+                                                    uniqueUserId={event.uniqueUserId}
+                                                    src={event.src}
+                                                    title={event.title}
+                                                    description={event.description}
+                                                    uniqueEventId={event.uniqueEventId} 
+                                                />
+                                            ))}
+                                        </div>
+                                    }
                                 </TabPanel>
                             </Grid>
                         </div>

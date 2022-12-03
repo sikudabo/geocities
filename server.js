@@ -1,3 +1,4 @@
+const dotenv = require('dotenv').config();
 const express = require('express');
 const app = express();
 const session = require('express-session');
@@ -22,8 +23,6 @@ const nodemailer = require('nodemailer');
 const sslRedirect = require('heroku-ssl-redirect');
 const routes = require('./routes/routes');
 const Community = require('./models/CommunityModel');
-
-//This is a comment
 
 app.set('port', process.env.PORT || 3001); //Either listen on process.env.PORT or port 3001.
 app.set('appName', 'GeoCities'); //Set the name of the application to "Excite".

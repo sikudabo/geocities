@@ -18,6 +18,10 @@ import Alive from '../site-images/Alive.jpeg';
 import Where from '../site-images/Where.jpeg';
 import MotionCity from '../site-images/MotionCity.jpeg';
 import RiotRock from '../site-images/RiotRock.jpeg';
+import Ghetto from '../site-images/ghetto.jpeg';
+import WeWereSharksCover from '../site-images/we_were_sharks_cover.jpeg';
+import HateMe from '../site-images/hate_me.jpeg';
+import JurassicPark from '../site-images/jurassic_park.jpg';
 import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
@@ -91,6 +95,36 @@ const songs = [
         song: 'Alright',
         artist: 'Skindred',
         cover: RiotRock,
+    },
+    {
+        song: 'Abandoned',
+        artist: 'Rod Wave',
+        cover: Ghetto,
+    },
+    {
+        song: 'Poison',
+        artist: 'Rod Wave',
+        cover: Ghetto,
+    },
+    {
+        song: 'Counted Steps',
+        artist: 'Rod Wave',
+        cover: Ghetto,
+    },
+    {
+        song: 'Shameless',
+        artist: 'We were sharks',
+        cover: WeWereSharksCover,
+    },
+    {
+        song: 'Jurassic Park',
+        artist: 'Stand Atlantic',
+        cover: JurassicPark,
+    },
+    {
+        song: 'Hate me (sometimes)',
+        artist: 'Stand Atlantic',
+        cover: HateMe,
     },
 ];
 

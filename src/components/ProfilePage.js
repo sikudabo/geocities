@@ -31,6 +31,7 @@ import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemAvatar from '@material-ui/core/ListItemAvatar';
 import Divider from '@material-ui/core/Divider';
 import Link from '@material-ui/core/Link';
+import UserEventsCard from './UserEventsCard';
 
 function TabPanel(props) {
     //This component will serve as the panel for each individual tab
@@ -129,6 +130,7 @@ function ProfilePage(props) {
     const [videoCaption, setVideoCaption] = useState(null); //Variable and setter for the caption for a video post. 
     const [user, setUser] = useState(props.user);
     const [communities, setCommunities] = useState([]); //This will be an array of communities a user belongs to.
+    const [events, setEvents] = useState([]); //Events the user has created
     useEffect(() => {
         //First, if the user doesn't exist in state, re-route to the login page.
         if(props.user === null) {
@@ -147,6 +149,7 @@ function ProfilePage(props) {
                     props.dispatch({type: 'ThemeChange', payload: response.data.user.profileTheme});
                     props.dispatch({type: 'userPosts/updatePosts', payload: response.data.posts});
                     setCommunities(response.data.communities);
+                    setEvents(response.data.events);
                 }
                 else if(response.data === 'user not found') {
                     swal(
@@ -304,7 +307,7 @@ function ProfilePage(props) {
             fd.append('dateString', dateString);
             fd.append('type', 'photo');
             fd.append('context', 'personal');
-            fd.append('link', `http://192.168.0.9:3000/profile#${Date.now()}${props.user.username}photoupload${props.user.uniqueUserId}`);
+            fd.append('link', `https://www.geocities.cc/profile#${Date.now()}${props.user.username}photoupload${props.user.uniqueUserId}`);
             fd.append('community', '');
             fd.append('title', '');
             fd.append('privacy', props.user.profilePrivacy);
@@ -385,7 +388,7 @@ function ProfilePage(props) {
             fd.append('dateString', dateString);
             fd.append('type', 'video');
             fd.append('context', 'personal');
-            fd.append('link', `http://192.168.0.9:3000/profile#${Date.now()}${props.user.username}videoupload${props.user.uniqueUserId}`);
+            fd.append('link', `https://www.geocities.cc/profile#${Date.now()}${props.user.username}videoupload${props.user.uniqueUserId}`);
             fd.append('community', '');
             fd.append('title', '');
             fd.append('privacy', props.user.profilePrivacy);
@@ -1309,7 +1312,31 @@ function ProfilePage(props) {
                         value={2} 
                         index={curTab2} 
                     >
-                        Events
+                        {(events !== null && events.length < 1) &&
+                            <Typography 
+                                component='h6'
+                                variant='h6' 
+                                align='center' 
+                            >
+                                No events
+                            </Typography>
+                        }
+                        {(events !== null && events.length > 0) &&
+                            <div>
+                                {events.map((event, index) => (
+                                    <UserEventsCard 
+                                        key={index.toString()}
+                                        username={event.username}
+                                        dateString={event.dateString}
+                                        uniqueUserId={event.uniqueUserId}
+                                        src={event.src}
+                                        title={event.title}
+                                        description={event.description}
+                                        uniqueEventId={event.uniqueEventId} 
+                                    />
+                                ))}
+                            </div>
+                        }
                     </TabPanel>
                 </Grid>
             </Grid>

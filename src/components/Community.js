@@ -278,7 +278,7 @@ function Community(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/public/join/community',
+            url: 'https://www.geocities.ccapi/public/join/community',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -324,7 +324,7 @@ function Community(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.cc/api/community/join/request',
+            url: 'https://www.geocities.ccapi/community/join/request',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -394,7 +394,7 @@ function Community(props) {
 
             return axios({
                 method: 'post',
-                url: 'https://www.geocities.cc/api/add/community/text/post',
+                url: 'https://www.geocities.ccapi/add/community/text/post',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -489,7 +489,7 @@ function Community(props) {
 
             return axios({
                 method: 'post',
-                url: 'https://www.geocities.cc/api/add/community/text/post',
+                url: 'https://www.geocities.ccapi/add/community/text/post',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -506,6 +506,7 @@ function Community(props) {
                     setTextPostTitle('');
                     setPosting(false);
                     setPostDialog(false);
+                    setPostLink('');
                 }
                 else {
                     swal(
@@ -587,7 +588,7 @@ function Community(props) {
             fd.append('dateString', dateString);
             fd.append('type', 'photo');
             fd.append('context', 'community');
-            fd.append('link', `http://192.168.0.9:3000/profile#${Date.now()}${props.mainUser.username}photoupload${props.mainUser.uniqueUserId}`);
+            fd.append('link', `https://www.geocities.cc/profile#${Date.now()}${props.mainUser.username}photoupload${props.mainUser.uniqueUserId}`);
             fd.append('community', community.name); //Name of the community that this post belongs to. 
             fd.append('title', '');
             fd.append('privacy', community.communityPrivacy);
@@ -595,7 +596,7 @@ function Community(props) {
 
             return axios({
                 method: 'POST',
-                url: 'https://www.geocities.cc/api/upload/photo',
+                url: 'https://www.geocities.ccapi/upload/photo',
                 data: fd,
                 headers: {
                     'Content-Type': 'multipart/form-data',
@@ -668,7 +669,7 @@ function Community(props) {
             fd.append('dateString', dateString);
             fd.append('type', 'video');
             fd.append('context', 'community');
-            fd.append('link', `http://192.168.0.9:3000/profile#${Date.now()}${props.mainUser.username}videoupload${props.mainUser.uniqueUserId}`);
+            fd.append('link', `https://www.geocities.cc/profile#${Date.now()}${props.mainUser.username}videoupload${props.mainUser.uniqueUserId}`);
             fd.append('community', community.name);
             fd.append('communityPost', true);
             fd.append('title', '');

@@ -380,61 +380,65 @@ function MessagesComponent(props) {
                     {threads.length > 0 &&
                         <div>
                             {threads.map((thread, index) => (
-                                <Paper 
-                                    key={index.toString()}
-                                    elevation={3} 
-                                    style={{
-                                        marginBottom: index < threads.length - 1 ? 20 : 0,
-                                    }}
-                                    className={classes.paper}
-                                    onClick={e => history.push(`/thread/${thread.uniqueThreadId}`)}
-                                >
-                                    <ListItem 
-                                        alignItems='flex-start' 
-                                    >
-                                        <ListItemAvatar>
-                                            <Avatar 
-                                                src={`https://www.geocities.cc/api/get/avatar/by/id/${findId(thread.uniqueUserIds[0], thread.uniqueUserIds[1])}`}
-                                                alt='Geo User' 
-                                                title='User avatar' 
-                                            />
-                                        </ListItemAvatar>
-                                        <ListItemText 
-                                            primary={
-                                                <div>
-                                                    <Typography 
-                                                        variant='h6' 
-                                                        component='h6' 
-                                                    >
-                                                        {findUsername(thread.usernames[0], thread.usernames[1])}
-                                                    </Typography>
-                                                    <Typography 
-                                                        variant='subtitle2' 
-                                                        component='span' 
-                                                        color='textSecondary' 
-                                                    >
-                                                        {timeDifference(thread.messages[thread.messages.length - 1].utcTime, thread.messages[thread.messages.length - 1].dateString)}
-                                                    </Typography>
-                                                </div>
-                                            }
-                                            secondary={
-                                                <Grid 
-                                                    item 
-                                                    zeroMinWidth 
-                                                >
-                                                    <Typography 
-                                                        variant='body1' 
-                                                        component='p' 
-                                                        color='default'
-                                                        noWrap 
-                                                    >
-                                                        {thread.messages[thread.messages.length - 1].msg}
-                                                    </Typography>
-                                                </Grid>
-                                            }
-                                        />
-                                    </ListItem>
-                                </Paper>
+                                <div>
+                                    {thread.messages.length > 0 &&
+                                        <Paper 
+                                            key={index.toString()}
+                                            elevation={3} 
+                                            style={{
+                                                marginBottom: index < threads.length - 1 ? 20 : 0,
+                                            }}
+                                            className={classes.paper}
+                                            onClick={e => history.push(`/thread/${thread.uniqueThreadId}`)}
+                                        >
+                                            <ListItem 
+                                                alignItems='flex-start' 
+                                            >
+                                                <ListItemAvatar>
+                                                    <Avatar 
+                                                        src={`https://www.geocities.cc/api/get/avatar/by/id/${findId(thread.uniqueUserIds[0], thread.uniqueUserIds[1])}`}
+                                                        alt='Geo User' 
+                                                        title='User avatar' 
+                                                    />
+                                                </ListItemAvatar>
+                                                <ListItemText 
+                                                    primary={
+                                                        <div>
+                                                            <Typography 
+                                                                variant='h6' 
+                                                                component='h6' 
+                                                            >
+                                                                {findUsername(thread.usernames[0], thread.usernames[1])}
+                                                            </Typography>
+                                                            <Typography 
+                                                                variant='subtitle2' 
+                                                                component='span' 
+                                                                color='textSecondary' 
+                                                            >
+                                                                {thread.messages.length > 0 ? timeDifference(thread.messages[thread.messages.length - 1].utcTime, thread.messages[thread.messages.length - 1].dateString) : ''}
+                                                            </Typography>
+                                                        </div>
+                                                    }
+                                                    secondary={
+                                                        <Grid 
+                                                            item 
+                                                            zeroMinWidth 
+                                                        >
+                                                            <Typography 
+                                                                variant='body1' 
+                                                                component='p' 
+                                                                color='default'
+                                                                noWrap 
+                                                            >
+                                                                {thread.messages.length > 0 ? thread.messages[thread.messages.length - 1].msg : ''}
+                                                            </Typography>
+                                                        </Grid>
+                                                    }
+                                                />
+                                            </ListItem>
+                                        </Paper>
+                                    }
+                                </div>
                             ))}
                         </div>
                     }

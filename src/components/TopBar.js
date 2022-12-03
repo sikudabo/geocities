@@ -35,7 +35,7 @@ function TopBar(props) {
     const history = useHistory();
     const classes = useStyles();
     const [anchorEl, setAnchorEl] = useState(null);
-    const [dark, setMode] = useState(false);
+    const [dark, setMode] = useState(props.theme === 'light' ? false : true);
 
     function changeAnchorEl(e) {
         setAnchorEl(e.currentTarget);
@@ -47,7 +47,7 @@ function TopBar(props) {
 
     function handleThemeChange(e) {
     
-        if(e.target.checked) {
+        if(props.theme === 'light') {
             setMode(true);
             props.dispatch({type: 'theme/dark'});
         }
@@ -251,6 +251,7 @@ function TopBar(props) {
                         checked={dark}
                         value={dark}
                         onChange={handleThemeChange}
+                        aria-label='Dark mode switch'
                     />
                 </div>
             </Toolbar>

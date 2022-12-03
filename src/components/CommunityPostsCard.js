@@ -501,7 +501,7 @@ function GeoUserPostsCard(props) {
                                 <TextField 
                                     label='Post link' 
                                     color='primary' 
-                                    value={`http://192.168.0.9:3000/community/${props.post.community}#${props.post.uniquePostId}`}
+                                    value={`https://www.geocities.cc/community/${props.post.community}#${props.post.uniquePostId}`}
                                     readonly 
                                 />
                             </MenuItem>
@@ -512,8 +512,8 @@ function GeoUserPostsCard(props) {
             <div>
                 {props.post.type === 'photo' &&
                     <CardMedia 
-                        className={classes.media}
-                        image={`https://www.geocities.cc/api/get-photo/${props.post.src}`}
+                        component='img'
+                        src={`https://www.geocities.cc/api/get-photo/${props.post.src}`}
                         title={`Post by ${props.post.username}`}
                         alt='GeoCities photo post'
                     />

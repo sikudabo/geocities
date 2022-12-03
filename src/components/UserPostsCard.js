@@ -519,7 +519,7 @@ function UserPostsCard(props) {
                                 <TextField 
                                     label='Post link' 
                                     color='primary' 
-                                    value={`http://192.168.0.9:3000/geouser/${props.post.uniqueUserId}#${props.post.uniquePostId}`}
+                                    value={`https://www.geocities.cc/geouser/${props.post.uniqueUserId}#${props.post.uniquePostId}`}
                                     readonly 
                                 />
                             </MenuItem>
