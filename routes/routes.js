@@ -14,7 +14,8 @@ const _ = require('underscore');
 const { mdiConsoleNetwork } = require('@mdi/js');
 const axios = require('axios');
 
-const dbUri = process.env.DB;
+const dbUri = dotenv.parsed.DB;
+let gfs;
 
 var conn = mongoose.createConnection(process.env.DB, {useNewUrlParser: true, useUnifiedTopology: true});
 mongoose.connect(process.env.DB, {useNewUrlParser: true, useUnifiedTopology: true});
@@ -45,11 +46,12 @@ const uploads = multer({ storage });
 
 //The route below will handle loggin a user into GeoCities.
 router.route('/api/login').post((req, res) => {
+    console.log('The dburi is', dbUri);
     //This is the route that will log a user into their profile. 
     //First, get the username and password from the body of the request object from the post request.
     let username = req.body.username;
     let password = req.body.password;
-    console.log('Someone is trying to login');
+    console.log('Someone is trying to login!!!!!!!!!');
 
     if(!req.body.username) {
         //Condition to handle if no username is found in the request. 
@@ -67,12 +69,14 @@ router.route('/api/login').post((req, res) => {
             }
             else {
                 //Check to see that the user was found. If not, that username doesn't exist. Send message to client.
+                console.log('The user is:', user);
                 if(!user) {
                     console.log('Username not found in database on log in attempt.');
                     res.status(200).send('user not found');
                 }
                 else {
                     //Get the password associated with this username and match it against the username the client sent.
+                    console.log('The password is:', user.password);
                     let checkPass = user.password;
                     if(checkPass === password) {
                         console.log('User verified on their login attempt.');
