@@ -45,10 +45,11 @@ const uploads = multer({ storage });
 
 
 //The route below will handle loggin a user into GeoCities.
-router.route('/api/login').post((req, res) => {
+router.route('/api/login').post(async (req, res) => {
     console.log('The dburi is', dbUri);
     console.log('The DB connection is:', conn);
     console.log('This should be working on the login, but is not due to a bad connection');
+    console.log('mongoose is connected?:', mongoose.connection.readyState);
     //This is the route that will log a user into their profile. 
     //First, get the username and password from the body of the request object from the post request.
     let username = req.body.username;
@@ -63,7 +64,7 @@ router.route('/api/login').post((req, res) => {
     //Wrap everything in a try/catch block 
     try {
         //Now, perform a query to get the user from the DB. 
-        User.findOne({username: username}, (err, user) => {
+        await User.findOne({username: username}, (err, user) => {
             if(err) {
                 //If there is an error, log the error to the console and send an error message to client.
                 console.log(err.message);

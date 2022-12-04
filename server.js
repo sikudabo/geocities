@@ -10,6 +10,7 @@ const _ = require('underscore');
 const fs = require('fs');
 const path = require('path');
 const mongoose = require('./database/mongoose');//This import will start the mongoose connection.
+const requireMongoose = require('mongoose');
 const querystring = require('querystring');
 const serveStatic = require('serve-static');
 const history = require('connect-history-api-fallback');
