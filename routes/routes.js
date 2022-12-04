@@ -14,7 +14,7 @@ const _ = require('underscore');
 const { mdiConsoleNetwork } = require('@mdi/js');
 const axios = require('axios');
 
-const dbUri = dotenv.parsed.DB;
+const dbUri = process.env.DB;
 let gfs;
 
 var conn = mongoose.createConnection(process.env.DB, {useNewUrlParser: true, useUnifiedTopology: true});
