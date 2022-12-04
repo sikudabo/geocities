@@ -47,6 +47,8 @@ const uploads = multer({ storage });
 //The route below will handle loggin a user into GeoCities.
 router.route('/api/login').post((req, res) => {
     console.log('The dburi is', dbUri);
+    console.log('The DB connection is:', conn);
+    console.log('This should be working on the login, but is not due to a bad connection');
     //This is the route that will log a user into their profile. 
     //First, get the username and password from the body of the request object from the post request.
     let username = req.body.username;
