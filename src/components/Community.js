@@ -623,7 +623,7 @@ function Community(props) {
                     setPhotoUploading(false);
                 }
             }).catch(err => {
-                console.log(err.message);
+                console.log("Error:", err.message);
                 swal(
                     'Uh Oh!',
                     'There was an error uploading that photo!',
