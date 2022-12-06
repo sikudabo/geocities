@@ -474,7 +474,7 @@ router.route('/api/add/comment').post((req, res) => {
                         msg: `${req.body.username} commented on your post.`,
                         type: 'comment',
                         uniqueSenderId: req.body.uniqueUserId,
-                        link: `${process.env.DEV_NETWORK_ADDRESS}profile#${req.body.uniquePostId}`,
+                        link: `https://www.geocities.cc/profile#${req.body.uniquePostId}`,
                         uniqueNotificationId: Date.now() + 'this' + req.body.uniquePostId,
                     };
 

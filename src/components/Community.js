@@ -511,7 +511,7 @@ function Community(props) {
                 else {
                     swal(
                         'Uh Oh!',
-                        'There was an error sending that link post!',
+                        'There was an error sending that link post! No data message',
                         'error',
                     );
                     setPosting(false);
@@ -520,7 +520,7 @@ function Community(props) {
                 console.log(err.message);
                 swal(
                     'Uh Oh!',
-                    'There was an error sending that link post! Please try again.',
+                    'There was an error sending that link post! Please try again. Catch error',
                     'error',
                 );
                 setPosting(false);
