@@ -278,7 +278,7 @@ function Community(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.ccapi/public/join/community',
+            url: 'https://www.geocities.cc/api/public/join/community',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -324,7 +324,7 @@ function Community(props) {
 
         return axios({
             method: 'POST',
-            url: 'https://www.geocities.ccapi/community/join/request',
+            url: 'https://www.geocities.cc/api/community/join/request',
             data: data,
             headers: {
                 'Content-Type': 'application/json',
@@ -394,7 +394,7 @@ function Community(props) {
 
             return axios({
                 method: 'post',
-                url: 'https://www.geocities.ccapi/add/community/text/post',
+                url: 'https://www.geocities.cc/api/add/community/text/post',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -489,7 +489,7 @@ function Community(props) {
 
             return axios({
                 method: 'post',
-                url: 'https://www.geocities.ccapi/add/community/text/post',
+                url: 'https://www.geocities.cc/api/add/community/text/post',
                 data: data,
                 headers: {
                     'Content-Type': 'application/json',
@@ -596,7 +596,7 @@ function Community(props) {
 
             return axios({
                 method: 'POST',
-                url: 'https://www.geocities.ccapi/upload/photo',
+                url: 'https://www.geocities.cc/api/upload/photo',
                 data: fd,
                 headers: {
                     'Content-Type': 'multipart/form-data',
